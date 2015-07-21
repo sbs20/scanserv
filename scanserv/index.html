@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scan</title>
+    <script src="javascript/jquery.min.js" type="text/javascript"></script>
+    <script src="javascript/jquery.Jcrop.js" type="text/javascript"></script>
+    <script src="javascript/jquery-ui.js" type="text/javascript"></script>
+    <script src="javascript/knockout-3.3.0.js" type="text/javascript"></script>
+    <script src="javascript/bootstrap.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="content/jquery.Jcrop.min.css" type="text/css" />
+    <link rel="stylesheet" href="content/jquery-ui.css" type="text/css">
+    <link rel="stylesheet" href="content/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="content/bootstrap-theme.min.css" type="text/css">
+    <link rel="stylesheet" href="content/theme.css" type="text/css">
+</head>
+<body role="document">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a href="" class="navbar-brand">ScanSvr</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </nav>
+
+    <div class="container theme-showcase" role="main">
+
+        <div class="row">
+            <div class="col-md-5">
+                <img id="image" src="preview/preview.jpg" />
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="top">Top</label>
+                    <input id="top" type="text" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="left">Left</label>
+                    <input id="left" type="text" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="width">Width</label>
+                    <input id="width" type="text" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="height">Height</label>
+                    <input id="height" type="text" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="resolution">Resolution</label>
+                    <select id="resolution" class="form-control">
+                        <option value="50">50 dpi</option>
+                        <option value="75">75 dpi</option>
+                        <option value="100">100 dpi</option>
+                        <option value="150">150 dpi</option>
+                        <option value="200">200 dpi</option>
+                        <option value="300">300 dpi</option>
+                        <option value="600">600 dpi</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="mode">Colour</label>
+                    <select id="mode" class="form-control">
+                        <option value="Gray">Greyscale</option>
+                        <option value="Color">Colour</option>
+                    </select>
+                </div>
+
+                <label for="brightness">Brightness</label>
+                <input id="brightness" type="text" class="form-control" />
+                <div id="brightness_slider" class="slider"></div>
+
+                <label for="Contrast">Contrast</label>
+                <input id="contrast" type="text" class="form-control" />
+                <div id="contrast_slider" class="slider"></div>
+
+                <input id="preview" type="button" value="preview" class="btn btn-default" />
+                <input id="scan" type="button" value="scan" class="btn btn-default" />
+            </div>
+
+            <div class="col-md-4">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Filename</th>
+                            <th>Last modified</th>
+                            <th>Filesize</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: files">
+                        <tr>
+                            <td><a data-bind="attr: { href: fullname }, text: name"></a></td>
+                            <td data-bind="text: new Date(lastModified * 1000).toString()"></td>
+                            <td data-bind="text: size"></td>
+                            <td><input type="button" data-bind="click: function () { page.deletefile(fullname); }" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="collapse-group">
+                <p><a class="btn" href="#" data-toggle="collapse" data-target="#cmdlinediv">Command line testing &raquo;</a></p>
+                <div class="collapse" id="cmdlinediv">
+                    <textarea id="cmdtext" rows="3" cols="80"></textarea>
+                    <input id="cmdexec" type="button" value="exec" class="btn btn-default" />
+                    <div id="response"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    var jcropmanager = {
+
+        millimetresPerDot: 25.4 /*mm per inch*/ / 50, /*dots per inch*/
+
+        jcrop_api: null,
+
+        dotsToMm: function (dots) {
+            return Math.round(dots * jcropmanager.millimetresPerDot);
+        },
+
+        //jcrop onChange and onSelect event handler
+        showCoords: function (c) {
+            $('#left').val(jcropmanager.dotsToMm(c.x));
+            $('#top').val(jcropmanager.dotsToMm(c.y));
+            $('#width').val(jcropmanager.dotsToMm(c.w));
+            $('#height').val(jcropmanager.dotsToMm(c.h));
+        },
+
+        //jcrop onRelease event handler
+        clearCoords: function () {
+            $('#left').val(0);
+            $('#top').val(0);
+            $('#width').val('');
+            $('#height').val('');
+        },
+
+        init: function () {
+            $('#image').Jcrop({
+                onChange: jcropmanager.showCoords,
+                onSelect: jcropmanager.showCoords,
+                onRelease: jcropmanager.clearCoords
+            }, function () {
+                jcropmanager.jcrop_api = this;
+            });
+        }
+    };
+
+    var api = {
+        call: function (data) {
+            var options = {
+                type: "POST",
+                contentType: "application/json",
+                dataType: "json",
+                url: 'api.php',
+                data: JSON.stringify(data)
+            };
+
+            return $.ajax(options);
+        },
+    };
+
+    var page = {
+
+        files: ko.observableArray(),
+
+        notify: function (o) {
+            var s = $.isPlainObject(o) ? JSON.stringify(o) : o;
+            $("#response").text(s);
+        },
+
+        refreshPreviewImage: function () {
+            api.call({
+                type: 'previewToJpeg'
+            }).done(function (data) {
+                var url = "preview/preview.jpg?r=" + Math.random();
+                $("#image").attr("src", url);
+                jcropmanager.jcrop_api.setImage(url);
+            })
+        },
+
+        preview: function () {
+            // Keep reloading the preview image
+            $("#preview").attr("disabled", "disabled");
+            var timer = window.setInterval(page.refreshPreviewImage, 2500);
+
+            // Start the scan
+            api.call({
+                type: 'preview'
+            }).done(function (data) {
+                window.clearInterval(timer);
+                $("#preview").removeAttr("disabled");
+            });
+        },
+
+        scan: function () {
+            $("#scan").attr("disabled", "disabled");
+
+            api.call({
+                type: 'scan',
+                data: {
+                    top: $("#top").val(),
+                    left: $("#left").val(),
+                    width: $("#width").val(),
+                    height: $("#height").val(),
+                    mode: $("#mode").val(),
+                    depth: 8,
+                    resolution: $("#resolution").val(),
+                    format: 'tiff',
+                    brightness: $("#brightness").val(),
+                    contrast: $("#contrast").val()
+                }
+            }).done(function (data) {
+                $("#scan").removeAttr("disabled");
+                page.notify(data);
+                page.listfiles();
+            });
+        },
+
+        listfiles: function () {
+            api.call({
+                type: 'fileList'
+            }).done(function (response) {
+                page.notify(response);
+                page.files.removeAll();
+                for (var index = 0; index < response.data.length; index++) {
+                    page.files.push(response.data[index]);
+                }
+            });
+        },
+
+        deletefile: function (file) {
+            api.call({
+                type: 'fileDelete',
+                data: file
+            }).done(function (response) {
+                page.notify(response);
+                page.listfiles();
+            });
+        },
+
+        cmdexec: function () {
+            $("#cmdexec").attr("disabled", "disabled");
+
+            api.call({
+                type: 'cmdline',
+                data: $("#cmdtext").val()
+            }).done(function (data) {
+                $("#cmdexec").removeAttr("disabled");
+                page.notify(data);
+            })
+        },
+
+        init: function () {
+            $("#preview").on("click", function () {
+                page.preview();
+            });
+
+            $("#scan").on("click", function () {
+                page.scan();
+            });
+
+            $("#cmdexec").on("click", function () {
+                page.cmdexec();
+            });
+
+            $(".slider").slider({
+                min: -100,
+                max: 100,
+                value: 0,
+                step: 1,
+                slide: function (e, ui) {
+                    var $input = $("#" + e.target.id.replace("_slider", ""));
+                    $input.val(ui.value);
+                }
+            });
+
+            $("#brightness, #contrast").on("change", function (e) {
+                var val = parseInt(e.target.value);
+                var $slider = $("#" + e.target.id + "_slider");
+                val = isNaN(val) ? $slider.slider("value") : val;
+                if (val < -100) val = -100;
+                if (val > 100) val = 100;
+                e.target.value = val;
+                $slider.slider("value", val);
+            });
+
+            jcropmanager.init();
+
+            ko.applyBindings({
+                files: page.files
+            });
+
+            page.listfiles();
+        }
+    };
+
+    page.init();
+
+</script>
+</html>
