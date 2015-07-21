@@ -22,15 +22,12 @@ with this program; if not, write to the Free Software Foundation, Inc., 59
 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-------------------------------------------------------------------------
-
 requirements
 ============
 * SANE
 * ImageMagick
 * Apache web-server with PHP-support
 
-------------------------------------------------------------------------
 
 background
 ==========
@@ -42,7 +39,7 @@ This is yet another apache-php-scanimage-web-front-end. Why?
    I don't need a webapp to do that stuff
  * Desire for easier and cleaner set up and configuration
  * Separation of presentation and control logic with json-rpc
- * I wanted to
+ * I just wanted to
 
 roadmap
 =======
@@ -56,9 +53,10 @@ roadmap
 
 installation
 ============
-Apache with PHP5+
-ipkg install libieee1284
-ipkg install sane-backends
-ipkg install imagemagick
-Copy this website to your apache webserver
+
+ * Apache with PHP5+
+ * ipkg install libieee1284
+ * ipkg install sane-backends
+ * ipkg install imagemagick
+ * Copy this website to your apache webserver
 
