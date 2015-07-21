@@ -1,18 +1,46 @@
 ﻿body {
-  padding-top: 70px;
-  padding-bottom: 30px;
+    padding-top: 70px;
+    padding-bottom: 30px;
+    font-family: 'Segoe UI';
+    background-color: white;
+    font-size: large;
 }
 
 .theme-dropdown .dropdown-menu {
-  position: static;
-  display: block;
-  margin-bottom: 20px;
+    position: static;
+    display: block;
+    margin-bottom: 20px;
 }
 
 .theme-showcase > p > .btn {
-  margin: 5px 0;
+    margin: 5px 0;
 }
 
 .theme-showcase .navbar .container {
-  width: auto;
+    width: auto;
+}
+
+.navbar-inverse {
+    background-color: #024D8C;
+    background-image: none;
+    border-color: black;
+}
+
+#image {
+    background-color: #3C98E4;
+    height: 584px;
+    width: 423px;
+    border: 1px solid black;
+}
+
+label, th {
+    font-size: x-large;
+    font-weight: 300;
+    color: #0E5EA0;
+}
+
+h1 {
+    font-size: 4em;
+    font-weight: 100;
+    color: #0E5EA0;
 }

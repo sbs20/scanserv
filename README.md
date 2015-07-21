@@ -48,6 +48,7 @@ roadmap
  * Configuration page for debugging set up assisting new users
  * Multi-language support
  * Server storage of configuration
+ * Add local storage too (amplify?)
 
 ------------------------------------------------------------------------
 

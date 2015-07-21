@@ -20,7 +20,6 @@
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
-                <a href="" class="navbar-brand">ScanSvr</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
             </div>
@@ -30,88 +29,109 @@
 
     <div class="container theme-showcase" role="main">
 
+        <h1>scanserv</h1>
         <div class="row">
             <div class="col-md-5">
-                <img id="image" src="preview/preview.jpg" />
+                <div id="image"></div>
             </div>
 
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label for="top">Top</label>
-                    <input id="top" type="text" class="form-control" />
+            <div class="col-md-7">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="top">Top</label>
+                            <input id="top" type="text" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="left">Left</label>
+                            <input id="left" type="text" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="width">Width</label>
+                            <input id="width" type="text" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="height">Height</label>
+                            <input id="height" type="text" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="resolution">Resolution</label>
+                            <select id="resolution" class="form-control">
+                                <option value="50">50 dpi</option>
+                                <option value="75">75 dpi</option>
+                                <option value="100">100 dpi</option>
+                                <option value="150" selected="selected">150 dpi</option>
+                                <option value="200">200 dpi</option>
+                                <option value="300">300 dpi</option>
+                                <option value="600">600 dpi</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mode">Colour</label>
+                            <select id="mode" class="form-control">
+                                <option value="Gray">Greyscale</option>
+                                <option value="Color" selected="selected">Colour</option>
+                            </select>
+                        </div>
+
+                        <label for="brightness">Brightness</label>
+                        <input id="brightness" type="text" class="form-control" />
+                        <div id="brightness_slider" class="slider"></div>
+
+                        <label for="Contrast">Contrast</label>
+                        <input id="contrast" type="text" class="form-control" />
+                        <div id="contrast_slider" class="slider"></div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="left">Left</label>
-                    <input id="left" type="text" class="form-control" />
+                <div class="row">
+                    <br />
                 </div>
 
-                <div class="form-group">
-                    <label for="width">Width</label>
-                    <input id="width" type="text" class="form-control" />
+                <div class="row">
+                    <div class="text-right">
+                        <div class="btn-group" role="group" aria-label="...">
+                            <button id="preview" type="button" class="btn btn-default btn-lg">preview <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                            <button id="scan" type="button" class="btn btn-default btn-lg">scan <span class="glyphicon glyphicon-camera" aria-hidden="true"></span></button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="height">Height</label>
-                    <input id="height" type="text" class="form-control" />
+                <div class="row">
+                    <br />
                 </div>
 
-                <div class="form-group">
-                    <label for="resolution">Resolution</label>
-                    <select id="resolution" class="form-control">
-                        <option value="50">50 dpi</option>
-                        <option value="75">75 dpi</option>
-                        <option value="100">100 dpi</option>
-                        <option value="150">150 dpi</option>
-                        <option value="200">200 dpi</option>
-                        <option value="300">300 dpi</option>
-                        <option value="600">600 dpi</option>
-                    </select>
+                <div class="row">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Filename</th>
+                                <th>Last modified</th>
+                                <th>Filesize</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: files">
+                            <tr>
+                                <td><a data-bind="attr: { href: fullname }, text: name"></a></td>
+                                <td data-bind="text: new Date(lastModified * 1000).toString()"></td>
+                                <td data-bind="text: size"></td>
+                                <td><button type="button" data-bind="click: function () { page.deletefile(fullname); }"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-
-                <div class="form-group">
-                    <label for="mode">Colour</label>
-                    <select id="mode" class="form-control">
-                        <option value="Gray">Greyscale</option>
-                        <option value="Color">Colour</option>
-                    </select>
-                </div>
-
-                <label for="brightness">Brightness</label>
-                <input id="brightness" type="text" class="form-control" />
-                <div id="brightness_slider" class="slider"></div>
-
-                <label for="Contrast">Contrast</label>
-                <input id="contrast" type="text" class="form-control" />
-                <div id="contrast_slider" class="slider"></div>
-
-                <input id="preview" type="button" value="preview" class="btn btn-default" />
-                <input id="scan" type="button" value="scan" class="btn btn-default" />
-            </div>
-
-            <div class="col-md-4">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Filename</th>
-                            <th>Last modified</th>
-                            <th>Filesize</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody data-bind="foreach: files">
-                        <tr>
-                            <td><a data-bind="attr: { href: fullname }, text: name"></a></td>
-                            <td data-bind="text: new Date(lastModified * 1000).toString()"></td>
-                            <td data-bind="text: size"></td>
-                            <td><input type="button" data-bind="click: function () { page.deletefile(fullname); }" /></td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
 
-        <div class="row">
+        <div class="hide">
             <div class="collapse-group">
                 <p><a class="btn" href="#" data-toggle="collapse" data-target="#cmdlinediv">Command line testing &raquo;</a></p>
                 <div class="collapse" id="cmdlinediv">
@@ -127,12 +147,18 @@
 <script>
     var jcropmanager = {
 
-        millimetresPerDot: 25.4 /*mm per inch*/ / 50, /*dots per inch*/
+        previewDpi: 50,
+        millimetresPerInch: 25.4,
+        a4: {
+            width: 215,
+            height: 297
+        },
 
         jcrop_api: null,
 
         dotsToMm: function (dots) {
-            return Math.round(dots * jcropmanager.millimetresPerDot);
+            var millimetresPerDot = this.millimetresPerInch / this.previewDpi;
+            return Math.round(dots * millimetresPerDot);
         },
 
         //jcrop onChange and onSelect event handler
@@ -190,7 +216,7 @@
                 type: 'previewToJpeg'
             }).done(function (data) {
                 var url = "preview/preview.jpg?r=" + Math.random();
-                $("#image").attr("src", url);
+                $("#image").css("background", "url(" + url + ") no-repeat");
                 jcropmanager.jcrop_api.setImage(url);
             })
         },
