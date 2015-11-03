@@ -189,17 +189,28 @@
     };
 
     var api = {
+        url: null,
         call: function (data) {
             var options = {
                 type: "POST",
                 contentType: "application/json",
                 dataType: "json",
-                url: 'api.php',
+                url: api.url,
                 data: JSON.stringify(data)
             };
 
             return $.ajax(options);
         },
+        
+        init: function () {
+            api.url = 'api.php';
+            
+            api.call({
+                type: 'ping'
+            }).error(function (data) {
+                api.url = 'api.js'
+            });
+        }
     };
 
     var page = {
@@ -336,6 +347,8 @@
             page.listfiles();
         }
     };
+
+    api.init();
 
     page.init();
 

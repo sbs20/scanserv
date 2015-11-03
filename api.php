@@ -2,9 +2,9 @@
 // Enable buffering
 ob_start();
 
-include("classes/Scanimage.php");
-include("classes/ScanRequest.php");
-include("classes/FileInfo.php");
+include("classes_php/Scanimage.php");
+include("classes_php/ScanRequest.php");
+include("classes_php/FileInfo.php");
 
 // Write ajax header
 //Content-Type: application/json; charset=utf-8
@@ -137,7 +137,11 @@ class Api {
 				case "cmdline":
 					$responseData = self::HandleCmdlineRequest($request);
 					break;
-
+					
+				case "ping":
+					$responseData = "Pong@".date("Y-m-d H.i.s",time());
+					break;
+					
 				default:
 					$responseType = "unknown";
 					$responseData = null;
