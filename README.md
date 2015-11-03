@@ -19,10 +19,12 @@ with this program; if not, write to the Free Software Foundation, Inc., 59
 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # requirements
-* SANE
-* ImageMagick
-* Apache web-server with PHP-support
+  * SANE
+  * ImageMagick
+  * Apache web-server with PHP-support
 
+# installation notes
+ * Installation notes [here](install.md)
 
 # background
 This is yet another apache-php-scanimage-web-front-end. Why?
@@ -41,15 +43,6 @@ This is yet another apache-php-scanimage-web-front-end. Why?
  * Server storage of configuration
  * Add local storage too (amplify?)
  * nodejs implementation
-
-# requirements
- * Apache with PHP5+
- * ipkg install libieee1284
- * ipkg install sane-backends
- * ipkg install imagemagick
- * Copy this website to your apache webserver
- * Make sure your website has permission to run the php files, and imagemagick
- * Installation notes [here](install.md)
 
 # acknowledgements
  * This project owes a HUGE amount to [phpsane](http://sourceforge.net/projects/phpsane/).
