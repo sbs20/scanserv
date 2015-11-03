@@ -60,4 +60,5 @@ installation
  * ipkg install sane-backends
  * ipkg install imagemagick
  * Copy this website to your apache webserver
+ * Make sure your website has permission to run the php files, and imagemagick
 
