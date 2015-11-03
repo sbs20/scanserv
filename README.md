@@ -37,6 +37,9 @@ This is yet another apache-php-scanimage-web-front-end. Why?
  * I just wanted to
 
 # roadmap
+ * Setup page (auto diagnostics)
+ * Remove cmdline
+ * Raspberry Pi 
  * Nicer looking UI
  * Configuration page for debugging set up assisting new users
  * Multi-language support
@@ -49,3 +52,6 @@ This is yet another apache-php-scanimage-web-front-end. Why?
    In many respects phpsane is more powerful than this. Scanserv does not support jpeg
    conversion or OCR. phpSANE, however, is also more brittle and somewhat dated in its
    implementation. 
+   
+# more about SANE
+ * http://www.sane-project.org/
