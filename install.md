@@ -23,6 +23,6 @@
 Todo
 
 ## References
- * (http://forum.qnap.com/viewtopic.php?f=182&t=8351)
- * (http://sourceforge.net/p/phpsane/wiki/FreeBSD/)
+ * http://forum.qnap.com/viewtopic.php?f=182&t=8351
+ * http://sourceforge.net/p/phpsane/wiki/FreeBSD/
   
