@@ -4,7 +4,7 @@ on a network without the need for drivers or complicated installation. scanserv
 does not do image conversion or manipulation (beyond the bare minimum necessary
 for the purposes of browser preview) or OCR.
 
-Copyright 2015	Sam Strachan (sam.strachan@gmail.com)
+Copyright 2015	[Sam Strachan](https://github.com/sbs20)
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
