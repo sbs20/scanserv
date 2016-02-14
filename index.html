@@ -153,6 +153,10 @@
             width: 215,
             height: 297
         },
+        canvas: {
+            width: 215 * 50 / 25.4,
+            height: 297 * 50 / 25.4
+        },
 
         jcrop_api: null,
 
@@ -160,7 +164,7 @@
             var millimetresPerDot = this.millimetresPerInch / this.previewDpi;
             return Math.round(dots * millimetresPerDot);
         },
-
+        
         //jcrop onChange and onSelect event handler
         showCoords: function (c) {
             $('#left').val(jcropmanager.dotsToMm(c.x));
@@ -181,7 +185,8 @@
             $('#image').Jcrop({
                 onChange: jcropmanager.showCoords,
                 onSelect: jcropmanager.showCoords,
-                onRelease: jcropmanager.clearCoords
+                onRelease: jcropmanager.clearCoords,
+                setSelect: [0, jcropmanager.canvas.height, jcropmanager.canvas.width, 0]
             }, function () {
                 jcropmanager.jcrop_api = this;
             });
@@ -337,7 +342,7 @@
                 e.target.value = val;
                 $slider.slider("value", val);
             });
-
+            
             jcropmanager.init();
 
             ko.applyBindings({
