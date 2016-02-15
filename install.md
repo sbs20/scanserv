@@ -28,8 +28,8 @@ sudo apt-get install apache2 apache2-utils libapache2-mod-php5 php5 sane-utils i
 ```
 
 ### Check SANE is working
-You need to configure sane here - configuring sane is outside the scope of this document. Make sure you have the scanner avaible via saned as we will not be giving permissions to access the scanner otherwise.
-It is setup correctly if scanimage -L shows a net scanner
+You need to configure sane here - configuring sane is outside the scope of this document, although I have 
+found that I didn't need to do anything. To check it's setup correctly see if scanimage -L shows a net scanner
 
 ```
 pi@printserver:~ $ scanimage -L
@@ -38,6 +38,7 @@ Should show: something like
     device `net:localhost:plustek:libusb:001:004' is a Canon CanoScan N1240U/LiDE30 flatbed scanner
 
 ### Check apache can use SANE
+If you know about saned and permissions then you may not need to worry about this.
 ```
 sudo su -m www-data -c 'scanimage --test'
 ```
@@ -47,14 +48,18 @@ sudo gpasswd -a www-data scanner
 ```
 
 ### Download and configure
-Note, older versions of raspbian install web pages in /var/www, we are assuming /var/www/html as that is what newer versions use
-
-Download and install scanserv (note, this will download a file called master.zip to the current directory, make sure you are okay with that)
-We are going to install scanserv into scanner to that you can access it with the url http://my.pi.example.com/scanner
+Download and install scanserv (note, this will download a file called master.zip to the current user's home
+directory). 
 
 ```
 cd ~
 sudo wget https://github.com/sbs20/scanserv/archive/master.zip
+```
+Note, older versions of raspbian install web pages in /var/www, we are assuming /var/www/html as that is 
+what newer versions use. We are going to install scanserv so that you can access it with the url
+http://my.pi.example.com/scanserv
+
+```
 cd /var/www/html
 sudo unzip ~/master.zip
 sudo mv scanserv-master/ scanserv
@@ -64,12 +69,12 @@ Ideally you should limit access to these directories like this...
 sudo chown -R root:www-data /var/www/html/scanserv/output/
 sudo chown -R root:www-data /var/www/html/scanserv/preview/
 ```
-And set write permissions
+And set write permissions - the web site needs to create image files in these directories
 ```
 sudo chmod 775 /var/www/html/scanserv/output/
 sudo chmod 775 /var/www/html/scanserv/preview/
 ```
-Now configure scanserv
+Now configure scanserv to point at the binaries
 
 ```
 sudo nano /var/www/html/scanserv/classes_php/Config.php
