@@ -20,7 +20,12 @@
  * Open your browser and navigate to http://YOUR_QNAP:PORT/scanserv/ 
 
 ## Raspberry Pi
- First we need to install sane, apache, and php5
+*Please note:* USB only scanners draw a lot of current relative to the Pi's available power. This manifested itself
+in unusual scans - technically valid images but with odd colours and block transforms. So I needed to switch and 
+use a powered USB hub for my Canon LIDE 20. Because of my USB3.0 hub that in turn led to USB issues. If you encounter
+similar then see here: https://www.raspberrypi.org/forums/viewtopic.php?f=28&t=53832
+
+First we need to install sane, apache, and php5
 
 ```
 sudo apt-get update
