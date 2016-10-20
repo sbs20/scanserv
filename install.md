@@ -1,23 +1,98 @@
 # installation
 
-## QNAP NAS install
- * [Install IPKG](http://wiki.qnap.com/wiki/Install_Optware_IPKG)
+## QNAP NAS install [Works on QTS 4.2.2]
+ * [Install Entware](https://github.com/sbs20/qnap-cookbook/blob/master/basics.md)
  * SSH into your NAS - e.g. use PuTTY as admin
  * Plug your scanner into a USB port
  * Type `lsusb` to check the scanner is attached
  * At the terminal type the following commands
-    * `ipkg update`
-    * `ipkg install libieee1284`
-    * `ipkg install sane-backends`
-    * `ipkg install imagemagick`
+    * `opkg update`
+    * `opkg install sane-frontends imagemagick sudo`
  * Confirm installation typing...
     * `sane-find-scanner -q`
     * `scanimage -L`
-    * `su -m httpdusr -c 'scanimage --test'` - if this fails you need to give permission to scanimage for httpdusr
- * [Download the scanserv code](https://github.com/sbs20/scanserv/archive/master.zip) and copy it to your Qweb share
+
+### Pretend to be httpduser
+```
+sudo -i -u httpdusr
+```
+
+If (when) that fails you need to edit sudoers and try again
+
+```
+nano /opt/etc/sudoers
+```
+add 
+```
+admin ALL=(ALL) ALL
+```
+
+Once you're httpdusr then ....
+```
+/opt/bin/scanimage -L
+```
+There are any number of problems you might face here. Your user probably won't have
+access to "scanimage" or usb devices or the sane.d directory. And you should probably
+do this with a group privilege.
+
+[This thread](https://wiki.archlinux.org/index.php/SANE) and 
+[This thread](https://bugs.launchpad.net/ubuntu/+source/sane-backends/+bug/270185/comments/3)
+are really useful. The short version is to do this:
+
+```
+addgroup scanner
+usermod -G scanner httpdusr
+chgrp scanner /dev/usb/*
+chmod g+rw /dev/usb/*
+chgrp scanner /opt/bin/scanimage
+chmod 644 /opt/etc/sane.d/*
+```
+
+Find out the bus and device of your scanner using lsusb ...
+```
+Bus 003 Device 003: ID 04a9:220d Canon, Inc. CanoScan N670U/N676U/LiDE 20
+```
+Then do this: chgrp scanner /proc/usb/bus/dev - so I did this:
+```
+chgrp scanner /proc/usb/003/003
+```
+
+### Install the website
+```
+cd ~
+wget --no-check-certificate https://github.com/sbs20/scanserv/archive/master.zip
+cd /share/Qweb
+sudo unzip ~/master.zip
+sudo mv scanserv-master/ scanserv
+```
+
+### Set variables correctly
+```
+/opt/bin/nano /share/Qweb/classes_php/Config.php
+```
+Then set the Scanimage and Convert lines - mine were as follows
+```
+<?php
+class Config {
+        const IsTrace = false;
+        const TraceLineEnding = "<br>\n";
+        const Scanimage  = "/opt/bin/scanimage";
+        const Convert  = "/usr/local/sbin/convert";
+        const BypassSystemExecute = false;
+        const OutputDirectory = "./output/";
+        const PreviewDirectory = "./preview/";
+        const MaximumScanWidthInMm = 215;
+        const MaximumScanHeightInMm = 297;
+}
+?>
+```
+
+### Test
  * You may need to set the permissions of your new directory: `chmod 775 /share/Qweb/scanserv`
  * Ensure your QNAP web server is running
  * Open your browser and navigate to http://YOUR_QNAP:PORT/scanserv/ 
+
+
 
 ## Raspberry Pi
 *Please note:* USB only scanners draw a lot of current relative to the Pi's available power. This manifested itself
@@ -92,4 +167,22 @@ Edit anything else you think is interesting, though the other defaults should be
 ## References
  * http://forum.qnap.com/viewtopic.php?f=182&t=8351
  * http://sourceforge.net/p/phpsane/wiki/FreeBSD/
-  
+
+## QNAP NAS install OLD
+ * [Install IPKG](http://wiki.qnap.com/wiki/Install_Optware_IPKG)
+ * SSH into your NAS - e.g. use PuTTY as admin
+ * Plug your scanner into a USB port
+ * Type `lsusb` to check the scanner is attached
+ * At the terminal type the following commands
+    * `ipkg update`
+    * `ipkg install libieee1284`
+    * `ipkg install sane-backends`
+    * `ipkg install imagemagick`
+ * Confirm installation typing...
+    * `sane-find-scanner -q`
+    * `scanimage -L`
+    * `su -m httpdusr -c 'scanimage --test'` - if this fails you need to give permission to scanimage for httpdusr
+ * [Download the scanserv code](https://github.com/sbs20/scanserv/archive/master.zip) and copy it to your Qweb share
+ * You may need to set the permissions of your new directory: `chmod 775 /share/Qweb/scanserv`
+ * Ensure your QNAP web server is running
+ * Open your browser and navigate to http://YOUR_QNAP:PORT/scanserv/ 
