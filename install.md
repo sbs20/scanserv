@@ -36,7 +36,7 @@ access to "scanimage" or usb devices or the sane.d directory. And you should pro
 do this with a group privilege.
 
 [This thread](https://wiki.archlinux.org/index.php/SANE) and 
-[This thread](https://bugs.launchpad.net/ubuntu/+source/sane-backends/+bug/270185/comments/3)
+[that thread](https://bugs.launchpad.net/ubuntu/+source/sane-backends/+bug/270185/comments/3)
 are really useful. The short version is to do this:
 
 ```
