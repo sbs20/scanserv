@@ -135,7 +135,8 @@ class Api {
 					break;
 
 				case "cmdline":
-					$responseData = self::HandleCmdlineRequest($request);
+					// $responseData = self::HandleCmdlineRequest($request);
+					$responseData = "cmdline is disabled. If you wish to debug httpdusr permissions you will need to manually enable this in the source.";
 					break;
 					
 				case "ping":
