@@ -1,8 +1,5 @@
 # installation
-
-## Prerequisites
-Get your scanner [working with SANE](install-sane.md). You will also need a PHP webserver. QNAP NAS
-boxes already have one but other linux flavours may not have.
+Make sure your scanner is [working with SANE](install-sane.md).
 
 ## QNAP
 ```
