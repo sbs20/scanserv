@@ -4,8 +4,7 @@
 Get your scanner [working with SANE](install-sane.md). You will also need a PHP webserver. QNAP NAS
 boxes already have one but other linux flavours may not have.
 
-## Install the website
-### QNAP
+## QNAP
 ```
 cd ~
 wget --no-check-certificate https://github.com/sbs20/scanserv/archive/master.zip
@@ -38,12 +37,12 @@ class Config {
 ?>
 ```
 
-#### Test
+### Test
  * You may need to set the permissions of your new directory: `chmod 775 /share/Qweb/scanserv`
  * Ensure your QNAP web server is running
  * Open your browser and navigate to http://YOUR_QNAP:PORT/scanserv/ 
 
-### Raspberry Pi / Debian
+## Raspberry Pi / Debian
 
 ```
 sudo apt-get update
@@ -62,7 +61,7 @@ if not then try
 sudo gpasswd -a www-data scanner
 ```
 
-#### Download and configure
+### Download and configure
 Download and install scanserv (note, this will download a file called master.zip to the current user's home
 directory). 
 
