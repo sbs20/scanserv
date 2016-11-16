@@ -17,14 +17,15 @@ class Scanimage implements IScanner {
 		$cmd = $cmd." --contrast ".$scanRequest->contrast;
 
 		// Last
-		$cmd = $cmd." > \"".$scanRequest->outputFilepath."\"";
+		$cmd = $cmd." | ". $scanRequest->outputFilter. " > \"".$scanRequest->outputFilepath."\"";
 		return $cmd;
 	}
 
 	public function Execute($scanRequest) {
 		$scanResponse = new ScanResponse();
 		$scanResponse->errors = $scanRequest->Validate();
-
+error_log("MODE: ".$scanRequest->mode);
+error_log("SCAN: ".$this->CommandLine($scanRequest));
 		if (count($scanResponse->errors) == 0) {
 			$scanResponse->cmdline = $this->CommandLine($scanRequest);
 			System::Execute($scanResponse->cmdline, $scanResponse->output, $scanResponse->returnCode);

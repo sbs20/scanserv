@@ -20,16 +20,31 @@ class Api {
 	}
 
 	public static function HandlePreviewRequest($request) {
+		$cmd = Config::Convert.'  -size 423x584 canvas:"#3C98E4" '.Config::PreviewDirectory.'preview.jpg';
+		System::Execute($cmd, $output, $ret);
+		//System::Execute("/bin/rm ".Config::PreviewDirectory."preview.jpg",$dumm,$ret);
+		$clientRequest = $request->data;
 		$scanRequest = new ScanRequest();
+		if ($clientRequest->mode) {
+			$scanRequest->mode = $clientRequest->mode;
+		}
+		if ($clientRequest->brightness) {
+			$scanRequest->brightness = (int)$clientRequest->brightness;
+		}
+		if ($clientRequest->contrast) {
+			$scanRequest->contrast = (int)$clientRequest->contrast;
+		}
 		$scanRequest->outputFilepath = Config::PreviewDirectory."preview.tif";
 		$scanRequest->resolution = 50;
+		$scanRequest->outputFilter = "/bin/cat";
 		$scanner = new Scanimage();
 		$scanResponse = $scanner->Execute($scanRequest);	
 		return $scanResponse;
 	}
 
 	public static function HandlePreviewToJpegRequest() {
-		$cmd = Config::Convert." ".Config::PreviewDirectory."preview.tif ".Config::PreviewDirectory."preview.jpg";
+		$cmd = Config::Convert.' -size 423x584 canvas:"#3C98E4" \( '.Config::PreviewDirectory.'preview.tif -trim \) -flatten -quality 30 '.Config::PreviewDirectory."preview.jpg";
+		$cmd = Config::Convert.' '.Config::PreviewDirectory.'preview.tif -trim -quality 30 '.Config::PreviewDirectory."preview.jpg";
 		System::Execute($cmd, $output, $ret);
 		return array("cmd" => $cmd, "output" => $output, "ret" => $ret);
 	}
@@ -71,8 +86,9 @@ class Api {
 			$scanRequest->contrast = (int)$clientRequest->contrast;
 		}
 
-		$outputfile = Config::OutputDirectory."Scan_".date("Y-m-d H.i.s",time()).".tif";
+		$outputfile = Config::OutputDirectory."Scan_".date("Y-m-d H.i.s",time()).".jpg";
 		$scanRequest->outputFilepath = $outputfile;
+		$scanRequest->outputFilter = Config::OutputFilter;
 		$scanner = new Scanimage();
 		$scanResponse = $scanner->Execute($scanRequest);
 	
@@ -84,7 +100,7 @@ class Api {
 		$outdir = System::OutputDirectory();
 
 		foreach (new DirectoryIterator($outdir) as $fileinfo) {
-			if(!is_dir($outdir.$fileinfo) && $fileinfo->getExtension() === "tif") {    
+			if(!is_dir($outdir.$fileinfo) && $fileinfo->getExtension() === "jpg") {    
 				$files[$fileinfo->getMTime()] = $fileinfo->getFilename();
 			}
 		}
