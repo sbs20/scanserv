@@ -31,8 +31,10 @@
 
         <h1>scanserv</h1>
         <div class="row">
-            <div class="col-md-5">
-                <div id="image"></div>
+            <div class="col-md-5" >
+                <div id="bgimage">
+		    <div id="image"></div>
+		</div>
             </div>
 
             <div class="col-md-7">
@@ -70,6 +72,7 @@
                                 <option value="200">200 dpi</option>
                                 <option value="300">300 dpi</option>
                                 <option value="600">600 dpi</option>
+                                <option value="1200">1200 dpi</option>
                             </select>
                         </div>
 
@@ -82,11 +85,11 @@
                         </div>
 
                         <label for="brightness">Brightness</label>
-                        <input id="brightness" type="text" class="form-control" />
+                        <input id="brightness" type="text" class="form-control" value="0" />
                         <div id="brightness_slider" class="slider"></div>
 
                         <label for="Contrast">Contrast</label>
-                        <input id="contrast" type="text" class="form-control" />
+                        <input id="contrast" type="text" class="form-control" value="0" />
                         <div id="contrast_slider" class="slider"></div>
                     </div>
                 </div>
@@ -231,20 +234,28 @@
             api.call({
                 type: 'previewToJpeg'
             }).done(function (data) {
-                var url = "preview/preview.jpg?r=" + Math.random();
-                $("#image").css("background", "url(" + url + ") no-repeat");
-                jcropmanager.jcrop_api.setImage(url);
+		var Img = new Image();
+		Img.src = "preview/preview.jpg?r=" + Math.random();
+		Img.onload = function() {
+			$("#image").css("background", "url(" + Img.src + ") no-repeat");
+			jcropmanager.jcrop_api.setImage(Img.src);
+		}
             })
         },
 
         preview: function () {
             // Keep reloading the preview image
             $("#preview").attr("disabled", "disabled");
-            var timer = window.setInterval(page.refreshPreviewImage, 2500);
+            var timer = window.setInterval(page.refreshPreviewImage, 500);
 
             // Start the scan
             api.call({
-                type: 'preview'
+                type: 'preview',
+                data: {
+                    mode: $("#mode").val(),
+                    brightness: $("#brightness").val(),
+                    contrast: $("#contrast").val()
+                }
             }).done(function (data) {
                 window.clearInterval(timer);
                 $("#preview").removeAttr("disabled");

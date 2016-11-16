@@ -2,8 +2,9 @@
 class Config {
 	const IsTrace = false;
 	const TraceLineEnding = "<br>\n";
-	const Scanimage  = "/opt/bin/scanimage";
-	const Convert  = "/opt/bin/convert";
+	const Scanimage  = "/usr/bin/scanimage";
+	const Convert  = "/usr/bin/convert";
+	const OutputFilter = "/usr/bin/convert tiff:- -normalize -sharpen 0x1 jpeg:-";
 	const BypassSystemExecute = false;
 	const OutputDirectory = "./output/";
 	const PreviewDirectory = "./preview/";
