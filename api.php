@@ -20,7 +20,19 @@ class Api {
 	}
 
 	public static function HandlePreviewRequest($request) {
+		$cmd = Config::Convert.' -size 423x584 canvas:"#3C98E4" '.Config::PreviewDirectory.'preview.jpg';
+		System::Execute($cmd, $output, $ret);
+		$clientRequest = $request->data;
 		$scanRequest = new ScanRequest();
+		if ($clientRequest->mode) {
+			$scanRequest->mode = $clientRequest->mode;
+		}
+		if ($clientRequest->brightness) {
+			$scanRequest->brightness = (int)$clientRequest->brightness;
+		}
+		if ($clientRequest->contrast) {
+			$scanRequest->contrast = (int)$clientRequest->contrast;
+		}
 		$scanRequest->outputFilepath = Config::PreviewDirectory."preview.tif";
 		$scanRequest->resolution = 50;
 		$scanner = new Scanimage();
@@ -29,7 +41,7 @@ class Api {
 	}
 
 	public static function HandlePreviewToJpegRequest() {
-		$cmd = Config::Convert." ".Config::PreviewDirectory."preview.tif ".Config::PreviewDirectory."preview.jpg";
+		$cmd = Config::Convert.' '.Config::PreviewDirectory.'preview.tif -trim -quality 30 '.Config::PreviewDirectory."preview.jpg";
 		System::Execute($cmd, $output, $ret);
 		return array("cmd" => $cmd, "output" => $output, "ret" => $ret);
 	}
