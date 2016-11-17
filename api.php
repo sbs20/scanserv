@@ -35,6 +35,7 @@ class Api {
 		}
 		$scanRequest->outputFilepath = Config::PreviewDirectory."preview.tif";
 		$scanRequest->resolution = 50;
+		$scanRequest->outputFilter = "/bin/cat";
 		$scanner = new Scanimage();
 		$scanResponse = $scanner->Execute($scanRequest);	
 		return $scanResponse;
@@ -83,8 +84,9 @@ class Api {
 			$scanRequest->contrast = (int)$clientRequest->contrast;
 		}
 
-		$outputfile = Config::OutputDirectory."Scan_".date("Y-m-d H.i.s",time()).".tif";
+		$outputfile = Config::OutputDirectory."Scan_".date("Y-m-d H.i.s",time()).".".Config::OutputExtention ;
 		$scanRequest->outputFilepath = $outputfile;
+		$scanRequest->outputFilter = Config::OutputFilter;
 		$scanner = new Scanimage();
 		$scanResponse = $scanner->Execute($scanRequest);
 	
@@ -96,7 +98,7 @@ class Api {
 		$outdir = System::OutputDirectory();
 
 		foreach (new DirectoryIterator($outdir) as $fileinfo) {
-			if(!is_dir($outdir.$fileinfo) && $fileinfo->getExtension() === "tif") {    
+			if(!is_dir($outdir.$fileinfo) && $fileinfo->getExtension() === Config::OutputExtention) {    
 				$files[$fileinfo->getMTime()] = $fileinfo->getFilename();
 			}
 		}
