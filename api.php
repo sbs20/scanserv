@@ -20,7 +20,8 @@ class Api {
 	}
 
 	public static function HandlePreviewRequest($request) {
-		$cmd = Config::Convert.' -size 423x584 canvas:"#3C98E4" '.Config::PreviewDirectory.'preview.jpg';
+		$wait=' -size 423x584 -fill white -background "#3C98E4" -pointsize 30 -gravity North label:"\nPlease wait..." ';
+		$cmd = Config::Convert.' '.$wait.' '.Config::PreviewDirectory.'preview.jpg';
 		System::Execute($cmd, $output, $ret);
 		$clientRequest = $request->data;
 		$scanRequest = new ScanRequest();
@@ -35,16 +36,16 @@ class Api {
 		}
 		$scanRequest->outputFilepath = Config::PreviewDirectory."preview.tif";
 		$scanRequest->resolution = 50;
-		$scanRequest->outputFilter = "/bin/cat";
 		$scanner = new Scanimage();
 		$scanResponse = $scanner->Execute($scanRequest);	
 		return $scanResponse;
 	}
 
 	public static function HandlePreviewToJpegRequest() {
-		$cmd = Config::Convert.' '.Config::PreviewDirectory.'preview.tif -trim -quality 30 '.Config::PreviewDirectory."preview.jpg";
+		$cmd = Config::PreviewFilter.' '.Config::PreviewDirectory.'preview.jpg  <'.Config::PreviewDirectory.'preview.tif';
 		System::Execute($cmd, $output, $ret);
-		return array("cmd" => $cmd, "output" => $output, "ret" => $ret);
+		$jpg=file_get_contents(Config::PreviewDirectory.'preview.jpg');
+		return array("cmd" => $cmd, "output" => $output, "ret" => $ret, "len" => strlen($jpg), "jpg" => base64_encode($jpg) );
 	}
 
 	public static function HandleScanRequest($request) {

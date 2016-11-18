@@ -32,9 +32,9 @@
         <h1>scanserv</h1>
         <div class="row">
             <div class="col-md-5">
-                <div id="bgimage">
-                    <div id="image"></div>
-                </div>
+	        <div id="image">
+                    <img id="previmage" src="#" alt="" width=423 style="display: none" />
+		</div>
             </div>
 
             <div class="col-md-7">
@@ -234,19 +234,18 @@
             api.call({
                 type: 'previewToJpeg'
             }).done(function (data) {
-                var previmg = new Image();
-                previmg.src = "preview/preview.jpg?r=" + Math.random();
-                previmg.onload = function() {
-                    $("#image").css("background", "url(" + previmg.src + ") no-repeat");
-                    jcropmanager.jcrop_api.setImage(previmg.src);
-                }
+		if ( data.data.len >= 2000 ) {
+			$("#previmage").attr('src',"data:image/jpeg;base64," + data.data.jpg );
+		}
+                
             })
         },
 
         preview: function () {
             // Keep reloading the preview image
             $("#preview").attr("disabled", "disabled");
-            var timer = window.setInterval(page.refreshPreviewImage, 500);
+            var timer = window.setInterval(page.refreshPreviewImage, 1000);
+            $("#previmage").attr("style", "display:block");
 
             // Start the scan
             api.call({
