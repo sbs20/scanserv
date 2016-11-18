@@ -20,7 +20,20 @@ class Api {
 	}
 
 	public static function HandlePreviewRequest($request) {
+		$wait=' -size 423x584 -fill white -background "#3C98E4" -pointsize 30 -gravity North label:"\nPlease wait..." ';
+		$cmd = Config::Convert.' '.$wait.' '.Config::PreviewDirectory.'preview.jpg';
+		System::Execute($cmd, $output, $ret);
+		$clientRequest = $request->data;
 		$scanRequest = new ScanRequest();
+		if ($clientRequest->mode) {
+			$scanRequest->mode = $clientRequest->mode;
+		}
+		if ($clientRequest->brightness) {
+			$scanRequest->brightness = (int)$clientRequest->brightness;
+		}
+		if ($clientRequest->contrast) {
+			$scanRequest->contrast = (int)$clientRequest->contrast;
+		}
 		$scanRequest->outputFilepath = Config::PreviewDirectory."preview.tif";
 		$scanRequest->resolution = 50;
 		$scanner = new Scanimage();
@@ -29,9 +42,10 @@ class Api {
 	}
 
 	public static function HandlePreviewToJpegRequest() {
-		$cmd = Config::Convert." ".Config::PreviewDirectory."preview.tif ".Config::PreviewDirectory."preview.jpg";
+		$cmd = Config::PreviewFilter.' '.Config::PreviewDirectory.'preview.jpg  <'.Config::PreviewDirectory.'preview.tif';
 		System::Execute($cmd, $output, $ret);
-		return array("cmd" => $cmd, "output" => $output, "ret" => $ret);
+		$jpg=file_get_contents(Config::PreviewDirectory.'preview.jpg');
+		return array("cmd" => $cmd, "output" => $output, "ret" => $ret, "len" => strlen($jpg), "jpg" => base64_encode($jpg) );
 	}
 
 	public static function HandleScanRequest($request) {
@@ -71,8 +85,9 @@ class Api {
 			$scanRequest->contrast = (int)$clientRequest->contrast;
 		}
 
-		$outputfile = Config::OutputDirectory."Scan_".date("Y-m-d H.i.s",time()).".tif";
+		$outputfile = Config::OutputDirectory."Scan_".date("Y-m-d H.i.s",time()).".".Config::OutputExtention ;
 		$scanRequest->outputFilepath = $outputfile;
+		$scanRequest->outputFilter = Config::OutputFilter;
 		$scanner = new Scanimage();
 		$scanResponse = $scanner->Execute($scanRequest);
 	
@@ -84,7 +99,7 @@ class Api {
 		$outdir = System::OutputDirectory();
 
 		foreach (new DirectoryIterator($outdir) as $fileinfo) {
-			if(!is_dir($outdir.$fileinfo) && $fileinfo->getExtension() === "tif") {    
+			if(!is_dir($outdir.$fileinfo) && $fileinfo->getExtension() === Config::OutputExtention) {    
 				$files[$fileinfo->getMTime()] = $fileinfo->getFilename();
 			}
 		}
