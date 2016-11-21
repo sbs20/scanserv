@@ -10,6 +10,7 @@
     <script src="javascript/jquery-ui.js" type="text/javascript"></script>
     <script src="javascript/knockout-3.3.0.js" type="text/javascript"></script>
     <script src="javascript/bootstrap.min.js" type="text/javascript"></script>
+    <script src="javascript/js.cookie.js" type="text/javascript"></script>
     <link rel="stylesheet" href="content/jquery.Jcrop.min.css" type="text/css" />
     <link rel="stylesheet" href="content/jquery-ui.css" type="text/css">
     <link rel="stylesheet" href="content/bootstrap.min.css" type="text/css">
@@ -148,6 +149,30 @@
 </body>
 
 <script>
+    var cooked = {
+
+	get: function () {
+	    if ( Form=Cookies.getJSON('form') ) {
+                    $("#mode").val(Form.mode);
+                    $("#resolution").val(Form.resolution);
+	    };
+	},
+
+	set: function () {
+		Cookies.set('form', { 
+			mode: $("#mode").val(),
+			resolution: $("#resolution").val(),
+		});
+	},
+
+	init: function () {
+	    cooked.get();
+            $("#resolution, #mode").on("change", function (e) {
+		cooked.set();
+            });
+	}
+    };
+
     var jcropmanager = {
 
         previewDpi: 50,
@@ -234,7 +259,7 @@
             api.call({
                 type: 'previewToJpeg'
             }).done(function (data) {
-		if ( data.data.len >= 2000 ) {
+		if ( data.data.jpg.length >= 500 ) {
 			$("#previmage").attr('src',"data:image/jpeg;base64," + data.data.jpg );
 		}
                 
@@ -366,6 +391,8 @@
     api.init();
 
     page.init();
+
+    cooked.init();
 
 </script>
 </html>
