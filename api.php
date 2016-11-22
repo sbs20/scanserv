@@ -45,7 +45,7 @@ class Api {
 		$cmd = Config::PreviewFilter.' '.Config::PreviewDirectory.'preview.jpg  <'.Config::PreviewDirectory.'preview.tif';
 		System::Execute($cmd, $output, $ret);
 		$jpg=file_get_contents(Config::PreviewDirectory.'preview.jpg');
-		return array("cmd" => $cmd, "output" => $output, "ret" => $ret, "len" => strlen($jpg), "jpg" => base64_encode($jpg) );
+		return array("cmd" => $cmd, "output" => $output, "ret" => $ret, "jpg" => base64_encode($jpg) );
 	}
 
 	public static function HandleScanRequest($request) {
