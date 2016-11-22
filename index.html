@@ -10,6 +10,7 @@
     <script src="javascript/jquery-ui.js" type="text/javascript"></script>
     <script src="javascript/knockout-3.3.0.js" type="text/javascript"></script>
     <script src="javascript/bootstrap.min.js" type="text/javascript"></script>
+    <script src="javascript/amplify.min.js" type="text/javascript"></script>
     <link rel="stylesheet" href="content/jquery.Jcrop.min.css" type="text/css" />
     <link rel="stylesheet" href="content/jquery-ui.css" type="text/css">
     <link rel="stylesheet" href="content/bootstrap.min.css" type="text/css">
@@ -42,22 +43,25 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="top">Top</label>
-                            <input id="top" type="text" class="form-control" />
+                            <input id="top" type="text" class="form-control" value="0" />
                         </div>
 
                         <div class="form-group">
                             <label for="left">Left</label>
-                            <input id="left" type="text" class="form-control" />
+                            <input id="left" type="text" class="form-control" value="0" />
                         </div>
 
                         <div class="form-group">
                             <label for="width">Width</label>
-                            <input id="width" type="text" class="form-control" />
+                            <input id="width" type="text" class="form-control" value="215" />
                         </div>
 
                         <div class="form-group">
                             <label for="height">Height</label>
-                            <input id="height" type="text" class="form-control" />
+                            <input id="height" type="text" class="form-control" value="297"/>
+                        </div>
+                        <div class="form-group">
+                            <button id="defaultsel" type="button" class="btn btn-default btn-lg">Full <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span></button>
                         </div>
                     </div>
 
@@ -91,6 +95,9 @@
                         <label for="Contrast">Contrast</label>
                         <input id="contrast" type="text" class="form-control" value="0" />
                         <div id="contrast_slider" class="slider"></div>
+                        <div class="form-group">
+                            <button id="defaultimg" type="button" class="btn btn-default btn-lg">Default <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>
+                        </div>
                     </div>
                 </div>
 
@@ -174,6 +181,7 @@
             $('#top').val(jcropmanager.dotsToMm(c.y));
             $('#width').val(jcropmanager.dotsToMm(c.w));
             $('#height').val(jcropmanager.dotsToMm(c.h));
+	    page.storeValues();
         },
 
         //jcrop onRelease event handler
@@ -189,7 +197,12 @@
                 onChange: jcropmanager.showCoords,
                 onSelect: jcropmanager.showCoords,
                 onRelease: jcropmanager.clearCoords,
-                setSelect: [0, jcropmanager.canvas.height, jcropmanager.canvas.width, 0]
+                setSelect: [
+			$("#left").val() * 50 / 25.4,
+			$("#height").val() * 50 / 25.4 + $("#top").val() * 50 / 25.4,
+			$("#width").val() * 50 / 25.4 + $("#left").val() * 50 / 25.4,
+			$("#top").val() * 50 / 25.4
+			]
             }, function () {
                 jcropmanager.jcrop_api = this;
             });
@@ -234,7 +247,7 @@
             api.call({
                 type: 'previewToJpeg'
             }).done(function (data) {
-		if ( data.data.len >= 2000 ) {
+		if ( data.data.jpg.length >= 500 ) {
 			$("#previmage").attr('src',"data:image/jpeg;base64," + data.data.jpg );
 		}
                 
@@ -319,6 +332,32 @@
             })
         },
 
+        setValues: function (formValues) {
+	    $("#top").val(formValues.top);
+	    $("#left").val(formValues.left);
+	    $("#width").val(formValues.width);
+	    $("#height").val(formValues.height);
+	    $("#resolution").val(formValues.resolution);
+	    $("#mode").val(formValues.mode);
+	    $("#brightness").val(formValues.brightness);
+	    $("#contrast").val(formValues.contrast);
+	},
+
+	storeValues: function () {
+	    amplify.store( "savedForm", {
+		top:$("#top").val(),
+		left:$("#left").val(),
+		width:$("#width").val(),
+		height:$("#height").val(),
+		resolution:$("#resolution").val(),
+		mode:$("#mode").val(),
+		brightness:$("#brightness").val(),
+		contrast:$("#contrast").val()
+	    }); 
+
+	},
+
+
         init: function () {
             $("#preview").on("click", function () {
                 page.preview();
@@ -326,6 +365,23 @@
 
             $("#scan").on("click", function () {
                 page.scan();
+            });
+
+            $("#defaultsel").on("click", function () {
+		$("#top").val(defaults.top);
+		$("#left").val(defaults.left);
+		$("#height").val(defaults.height);
+		$("#width").val(defaults.width);
+                page.storeValues();
+		jcropmanager.init();
+            });
+
+            $("#defaultimg").on("click", function () {
+		$("#resolution").val(defaults.resolution);
+		$("#color").val(defaults.color);
+		$("#brightness").val(defaults.brightness);
+		$("#contrast").val(defaults.contrast);
+                page.storeValues();
             });
 
             $("#cmdexec").on("click", function () {
@@ -339,7 +395,7 @@
                 step: 1,
                 slide: function (e, ui) {
                     var $input = $("#" + e.target.id.replace("_slider", ""));
-                    $input.val(ui.value);
+                    $input.val(ui.value).change();
                 }
             });
 
@@ -353,6 +409,11 @@
                 $slider.slider("value", val);
             });
             
+
+	    if ( savedForm = amplify.store("savedForm") ) {
+		page.setValues(savedForm);
+            };
+
             jcropmanager.init();
 
             ko.applyBindings({
@@ -360,8 +421,23 @@
             });
 
             page.listfiles();
+
+            $("#top, #left, #width, #height, #resolution, #mode, #brightness, #contrast").on("change", function (e) {
+		page.storeValues();
+            });
         }
     };
+
+    var defaults = {
+	top:0,
+	left:0,
+	width:215,
+	height:297,
+	resolution:150,
+	mode:"Color",
+	brightness:0,
+	contrast:0
+    }; 
 
     api.init();
 
