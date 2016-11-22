@@ -183,7 +183,7 @@
             $('#top').val(jcropmanager.dotsToMm(c.y));
             $('#width').val(jcropmanager.dotsToMm(c.w));
             $('#height').val(jcropmanager.dotsToMm(c.h));
-	    page.updateStoredValues();
+	    page.storeValues();
         },
 
         //jcrop onRelease event handler
@@ -345,8 +345,8 @@
 	    $("#contrast").val(formValues.contrast);
 	},
 
-	getValues: function() {
-	    var currentVals = {
+	storeValues: function () {
+	    amplify.store( "savedForm", {
 		top:$("#top").val(),
 		left:$("#left").val(),
 		width:$("#width").val(),
@@ -355,18 +355,8 @@
 		mode:$("#mode").val(),
 		brightness:$("#brightness").val(),
 		contrast:$("#contrast").val()
-	    }; 
-	    return currentVals;
-	},
+	    }); 
 
-	setStoredValues: function () {
-	    if ( savedForm = amplify.store("savedForm") ) {
-		page.setValues(savedForm);
-            };
-	},
-
-	updateStoredValues: function () {
-	    amplify.store( "savedForm", page.getValues());
 	},
 
 
@@ -385,7 +375,7 @@
 		$("#left").val(defaults.left);
 		$("#height").val(defaults.height);
 		$("#width").val(defaults.width);
-                page.updateStoredValues();
+                page.storeValues();
 		jcropmanager.init();
             });
 
@@ -394,7 +384,7 @@
 		$("#color").val(defaults.color);
 		$("#brightness").val(defaults.brightness);
 		$("#contrast").val(defaults.contrast);
-                page.updateStoredValues();
+                page.storeValues();
             });
 
             $("#cmdexec").on("click", function () {
@@ -423,7 +413,9 @@
             });
             
 
-	    page.setStoredValues();
+	    if ( savedForm = amplify.store("savedForm") ) {
+		page.setValues(savedForm);
+            };
 
             jcropmanager.init();
 
@@ -434,10 +426,8 @@
             page.listfiles();
 
             $("#top, #left, #width, #height, #resolution, #mode, #brightness, #contrast").on("change", function (e) {
-		page.updateStoredValues();
+		page.storeValues();
             });
-	    //$("#top, #left, #width, #height, #resolution, #mode, #brightness, #contrast").trigger("change");
-	
         }
     };
 
