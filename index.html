@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,6 +18,7 @@
     <link rel="stylesheet" href="content/bootstrap-theme.min.css" type="text/css">
     <link rel="stylesheet" href="content/theme.css" type="text/css">
 </head>
+
 <body role="document">
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
@@ -33,9 +35,9 @@
         <h1>scanserv</h1>
         <div class="row">
             <div class="col-md-5">
-	        <div id="image">
+                <div id="image">
                     <img id="previmage" src="#" alt="" width=423 style="display: none" />
-		</div>
+                </div>
             </div>
 
             <div class="col-md-7">
@@ -58,7 +60,7 @@
 
                         <div class="form-group">
                             <label for="height">Height</label>
-                            <input id="height" type="text" class="form-control" value="297"/>
+                            <input id="height" type="text" class="form-control" value="297" />
                         </div>
                         <div class="form-group">
                             <button id="defaultsel" type="button" class="btn btn-default btn-lg">Full <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span></button>
@@ -130,7 +132,9 @@
                         </thead>
                         <tbody data-bind="foreach: files">
                             <tr>
-                                <td><a data-bind="attr: { href: fullname }, text: name" download></a></td>
+                                <td>
+                                    <a data-bind="attr: { href: fullname }, text: name" download></a>
+                                </td>
                                 <td data-bind="text: new Date(lastModified * 1000).toString()"></td>
                                 <td data-bind="text: size"></td>
                                 <td><button type="button" data-bind="click: function () { page.deletefile(fullname); }"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td>
@@ -174,36 +178,55 @@
             var millimetresPerDot = this.millimetresPerInch / this.previewDpi;
             return Math.round(dots * millimetresPerDot);
         },
+
+        mmToDots: function (mm) {
+            var dotsPerMm = this.previewDpi / this.millimetresPerInch;
+            return Math.round(mm * dotsPerMm);
+        },
         
         //jcrop onChange and onSelect event handler
         showCoords: function (c) {
-            $('#left').val(jcropmanager.dotsToMm(c.x));
-            $('#top').val(jcropmanager.dotsToMm(c.y));
-            $('#width').val(jcropmanager.dotsToMm(c.w));
-            $('#height').val(jcropmanager.dotsToMm(c.h));
-	    page.storeValues();
+            page.values({
+                left: jcropmanager.dotsToMm(c.x),
+                top: jcropmanager.dotsToMm(c.y),
+                width: jcropmanager.dotsToMm(c.w),
+                height: jcropmanager.dotsToMm(c.h)
+            });
+
+    	    page.save();
         },
 
         //jcrop onRelease event handler
         clearCoords: function () {
-            $('#left').val(0);
-            $('#top').val(0);
-            $('#width').val('');
-            $('#height').val('');
+            page.values({
+                left: 0,
+                top: 0,
+                width: '',
+                height: ''
+            });
+            
+    	    page.save();
+        },
+
+        getSelect: function () {
+            var data = page.values();
+            return [
+                jcropmanager.mmToDots(data.left),
+                jcropmanager.mmToDots(data.height + data.top),
+                jcropmanager.mmToDots(data.width + data.left),
+                jcropmanager.mmToDots(data.top)
+            ];
         },
 
         init: function () {
-            $('#image').Jcrop({
+            var options = {
                 onChange: jcropmanager.showCoords,
                 onSelect: jcropmanager.showCoords,
                 onRelease: jcropmanager.clearCoords,
-                setSelect: [
-			$("#left").val() * 50 / 25.4,
-			$("#height").val() * 50 / 25.4 + $("#top").val() * 50 / 25.4,
-			$("#width").val() * 50 / 25.4 + $("#left").val() * 50 / 25.4,
-			$("#top").val() * 50 / 25.4
-			]
-            }, function () {
+                setSelect: jcropmanager.getSelect()
+            };
+
+            $('#image').Jcrop(options, function () {
                 jcropmanager.jcrop_api = this;
             });
         }
@@ -236,6 +259,17 @@
 
     var page = {
 
+        defaults: {
+            top: 0,
+            left: 0,
+            width: 215,
+            height: 297,
+            resolution: 150,
+            mode: 'Color',
+            brightness: 0,
+            contrast: 0
+        },
+
         files: ko.observableArray(),
 
         notify: function (o) {
@@ -247,11 +281,10 @@
             api.call({
                 type: 'previewToJpeg'
             }).done(function (data) {
-		if ( data.data.jpg.length >= 500 ) {
-			$("#previmage").attr('src',"data:image/jpeg;base64," + data.data.jpg );
-		}
-                
-            })
+                if ( data.data.jpg.length >= 500 ) {
+                    $("#previmage").attr('src',"data:image/jpeg;base64," + data.data.jpg );
+                }
+            });
         },
 
         preview: function () {
@@ -263,11 +296,7 @@
             // Start the scan
             api.call({
                 type: 'preview',
-                data: {
-                    mode: $("#mode").val(),
-                    brightness: $("#brightness").val(),
-                    contrast: $("#contrast").val()
-                }
+                data: page.values()
             }).done(function (data) {
                 window.clearInterval(timer);
                 $("#preview").removeAttr("disabled");
@@ -279,18 +308,7 @@
 
             api.call({
                 type: 'scan',
-                data: {
-                    top: $("#top").val(),
-                    left: $("#left").val(),
-                    width: $("#width").val(),
-                    height: $("#height").val(),
-                    mode: $("#mode").val(),
-                    depth: 8,
-                    resolution: $("#resolution").val(),
-                    format: 'tiff',
-                    brightness: $("#brightness").val(),
-                    contrast: $("#contrast").val()
-                }
+                data: page.values()
             }).done(function (data) {
                 $("#scan").removeAttr("disabled");
                 page.notify(data);
@@ -329,65 +347,52 @@
             }).done(function (data) {
                 $("#cmdexec").removeAttr("disabled");
                 page.notify(data);
-            })
+            });
         },
 
-        setValues: function (formValues) {
-	    $("#top").val(formValues.top);
-	    $("#left").val(formValues.left);
-	    $("#width").val(formValues.width);
-	    $("#height").val(formValues.height);
-	    $("#resolution").val(formValues.resolution);
-	    $("#mode").val(formValues.mode);
-	    $("#brightness").val(formValues.brightness);
-	    $("#contrast").val(formValues.contrast);
-	},
+        values: function () {
+            if (arguments.length === 0) {
+                return {
+                    top: parseInt($("#top").val()),
+                    left: parseInt($("#left").val()),
+                    width: parseInt($("#width").val()),
+                    height: parseInt($("#height").val()),
+                    mode: $("#mode").val(),
+                    depth: 8,
+                    resolution: parseInt($("#resolution").val()),
+                    format: 'tiff',
+                    brightness: parseInt($("#brightness").val()),
+                    contrast: parseInt($("#contrast").val())
+                };
+            } else {
+                var data = page.values();
+                $.extend(data, arguments[0]);
+                $("#top").val(data.top);
+                $("#left").val(data.left);
+                $("#width").val(data.width);
+                $("#height").val(data.height);
+                $("#resolution").val(data.resolution);
+                $("#mode").val(data.mode);
+                $("#brightness").val(data.brightness);
+                $("#brightness_slider").slider('value', data.brightness);
+                $("#contrast").val(data.contrast);
+                $("#contrast_slider").slider('value', data.contrast);
+            }
+        },
 
-	storeValues: function () {
-	    amplify.store( "savedForm", {
-		top:$("#top").val(),
-		left:$("#left").val(),
-		width:$("#width").val(),
-		height:$("#height").val(),
-		resolution:$("#resolution").val(),
-		mode:$("#mode").val(),
-		brightness:$("#brightness").val(),
-		contrast:$("#contrast").val()
-	    }); 
+        save: function () {
+            var vals = page.values();
+            amplify.store("savedForm", vals); 
+        },
 
-	},
-
+        load: function () {
+            var stored = amplify.store("savedForm") || page.defaults;
+            if (stored) {
+                page.values(stored);
+            }
+        },
 
         init: function () {
-            $("#preview").on("click", function () {
-                page.preview();
-            });
-
-            $("#scan").on("click", function () {
-                page.scan();
-            });
-
-            $("#defaultsel").on("click", function () {
-		$("#top").val(defaults.top);
-		$("#left").val(defaults.left);
-		$("#height").val(defaults.height);
-		$("#width").val(defaults.width);
-                page.storeValues();
-		jcropmanager.init();
-            });
-
-            $("#defaultimg").on("click", function () {
-		$("#resolution").val(defaults.resolution);
-		$("#color").val(defaults.color);
-		$("#brightness").val(defaults.brightness);
-		$("#contrast").val(defaults.contrast);
-                page.storeValues();
-            });
-
-            $("#cmdexec").on("click", function () {
-                page.cmdexec();
-            });
-
             $(".slider").slider({
                 min: -100,
                 max: 100,
@@ -397,6 +402,41 @@
                     var $input = $("#" + e.target.id.replace("_slider", ""));
                     $input.val(ui.value).change();
                 }
+            });
+
+            $("#preview").on("click", function () {
+                page.preview();
+            });
+
+            $("#scan").on("click", function () {
+                page.scan();
+            });
+
+            $("#defaultsel").on("click", function () {
+                page.values({
+                    top: page.defaults.top,
+                    left: page.defaults.left,
+                    height: page.defaults.height,
+                    width: page.defaults.width
+                });
+
+                page.save();
+        		jcropmanager.init();
+            });
+
+            $("#defaultimg").on("click", function () {
+                page.values({
+                    resolution: page.defaults.resolution,
+                    color: page.defaults.color,
+                    brightness: page.defaults.brightness,
+                    contrast: page.defaults.contrast
+                });
+
+                page.save();
+            });
+
+            $("#cmdexec").on("click", function () {
+                page.cmdexec();
             });
 
             $("#brightness, #contrast").on("change", function (e) {
@@ -409,39 +449,22 @@
                 $slider.slider("value", val);
             });
             
-
-	    if ( savedForm = amplify.store("savedForm") ) {
-		page.setValues(savedForm);
-            };
+            page.load();
 
             jcropmanager.init();
 
-            ko.applyBindings({
-                files: page.files
-            });
-
+            ko.applyBindings({ files: page.files });
             page.listfiles();
 
             $("#top, #left, #width, #height, #resolution, #mode, #brightness, #contrast").on("change", function (e) {
-		page.storeValues();
+                page.save();
             });
         }
     };
 
-    var defaults = {
-	top:0,
-	left:0,
-	width:215,
-	height:297,
-	resolution:150,
-	mode:"Color",
-	brightness:0,
-	contrast:0
-    }; 
-
     api.init();
-
     page.init();
 
 </script>
+
 </html>
