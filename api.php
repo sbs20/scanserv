@@ -94,6 +94,21 @@ class Api {
 		return $scanResponse;
 	}
 
+	public static function HandleGetDefaultsRequest() {
+		$response = array(
+			"top" => 0,
+			"left" => 0,
+			"width" => Config::MaximumScanWidthInMm,
+			"height" => Config::MaximumScanHeightInMm,
+			"resolution" => Config::DefaultResolution,
+			"mode" => Config::DefaultMode,
+			"brightness" => Config::DefaultBrightness,
+			"contrast" => Config::DefaultContrast
+		);
+
+		return $response;
+	}
+
 	public static function HandleFileListRequest() {
 		$files = array();
 		$outdir = System::OutputDirectory();
@@ -154,6 +169,10 @@ class Api {
 					$responseData = "cmdline is disabled. If you wish to debug httpdusr permissions you will need to manually enable this in the source.";
 					break;
 					
+				case "getDefaults":
+					$responseData = self::HandleGetDefaultsRequest();
+					break;
+
 				case "ping":
 					$responseData = "Pong@".date("Y-m-d H.i.s",time());
 					break;

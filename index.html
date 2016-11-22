@@ -259,17 +259,6 @@
 
     var page = {
 
-        defaults: {
-            top: 0,
-            left: 0,
-            width: 215,
-            height: 297,
-            resolution: 150,
-            mode: 'Color',
-            brightness: 0,
-            contrast: 0
-        },
-
         files: ko.observableArray(),
 
         notify: function (o) {
@@ -303,6 +292,14 @@
             });
         },
 
+	getdefaults: function () {
+	    api.call({
+		type: 'getDefaults'
+	    }).done(function (data) {
+		    page.defaults=data.data;
+	    });
+	},
+	
         scan: function () {
             $("#scan").attr("disabled", "disabled");
 
@@ -393,6 +390,7 @@
         },
 
         init: function () {
+	    page.getdefaults();
             $(".slider").slider({
                 min: -100,
                 max: 100,
@@ -448,7 +446,6 @@
                 e.target.value = val;
                 $slider.slider("value", val);
             });
-            
             page.load();
 
             jcropmanager.init();
@@ -463,6 +460,7 @@
     };
 
     api.init();
+
     page.init();
 
 </script>
