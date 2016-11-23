@@ -14,5 +14,10 @@ class Config {
 	const PreviewDirectory = "./preview/";
 	const MaximumScanWidthInMm = 215;
 	const MaximumScanHeightInMm = 297;
+
+	const DefaultResolution = 150;
+	const DefaultMode = "Color";
+	const DefaultBrightness = 0;
+	const DefaultContrast = "0";
 }
 ?>
