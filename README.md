@@ -1,4 +1,8 @@
 # scanserv
+Please note that [scanservjs](https://github.com/sbs20/scanservjs) is a newer
+and more up-to-date version of this software. It is based on nodejs which may
+or may not float your boat.
+
 scanserv is a simple web-based UI for SANE which allows you to share a scanner
 on a network without the need for drivers or complicated installation. scanserv
 does not do image conversion or manipulation (beyond the bare minimum necessary
