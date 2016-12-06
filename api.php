@@ -85,7 +85,7 @@ class Api {
 			$scanRequest->contrast = (int)$clientRequest->contrast;
 		}
 
-		$outputfile = Config::OutputDirectory."Scan_".date("Y-m-d H.i.s",time()).".".Config::OutputExtention ;
+		$outputfile = Config::OutputDirectory."Scan_".date("Y-m-d H.i.s",time()).".".Config::OutputExtension ;
 		$scanRequest->outputFilepath = $outputfile;
 		$scanRequest->outputFilter = Config::OutputFilter;
 		$scanner = new Scanimage();
@@ -114,7 +114,7 @@ class Api {
 		$outdir = System::OutputDirectory();
 
 		foreach (new DirectoryIterator($outdir) as $fileinfo) {
-			if(!is_dir($outdir.$fileinfo) && $fileinfo->getExtension() === Config::OutputExtention) {    
+			if(!is_dir($outdir.$fileinfo) && $fileinfo->getExtension() === Config::OutputExtension) {    
 				$files[$fileinfo->getMTime()] = $fileinfo->getFilename();
 			}
 		}
