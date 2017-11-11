@@ -20,8 +20,10 @@ found that I didn't need to do anything. To check it's setup correctly see if sc
 ```
 pi@printserver:~ $ scanimage -L
 ```
-Should show: something like 
-    device `net:localhost:plustek:libusb:001:004' is a Canon CanoScan N1240U/LiDE30 flatbed scanner
+Should show: something like
+```
+device `net:localhost:plustek:libusb:001:004' is a Canon CanoScan N1240U/LiDE30 flatbed scanner
+```
 
 ## For QNAP NAS install [Works on QTS 4.2.2]
 
