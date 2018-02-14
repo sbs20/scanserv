@@ -2,15 +2,16 @@
 // Enable buffering
 ob_start();
 
-include("classes_php/Scanimage.php");
-include("classes_php/ScanRequest.php");
-include("classes_php/FileInfo.php");
+include_once("classes_php/Scanimage.php");
+include_once("classes_php/ScanRequest.php");
+include_once("classes_php/ScannerOptions.php");
+include_once("classes_php/FileInfo.php");
 
 // Write ajax header
 //Content-Type: application/json; charset=utf-8
 
 header('Content-Type: application/json');
-date_default_timezone_set('Europe/London');
+//date_default_timezone_set('Europe/London');
 
 class Api {
 	public static function HandleCmdlineRequest($request) {
@@ -23,19 +24,30 @@ class Api {
 		$wait=' -size 423x584 -fill white -background "#3C98E4" -pointsize 30 -gravity North label:"\nPlease wait..." ';
 		$cmd = Config::Convert.' '.$wait.' '.Config::PreviewDirectory.'preview.jpg';
 		System::Execute($cmd, $output, $ret);
+        
 		$clientRequest = $request->data;
-		$scanRequest = new ScanRequest();
-		if ($clientRequest->mode) {
-			$scanRequest->mode = $clientRequest->mode;
-		}
-		if ($clientRequest->brightness) {
-			$scanRequest->brightness = (int)$clientRequest->brightness;
-		}
-		if ($clientRequest->contrast) {
-			$scanRequest->contrast = (int)$clientRequest->contrast;
-		}
+		
+        $scanRequest = new ScanRequest();
+        
+        if (isset($clientRequest->mode)) $scanRequest->options["mode"] = $clientRequest->mode;
+		if (isset($clientRequest->brightness)) $scanRequest->options["brightness"] = (int)$clientRequest->brightness;
+		if (isset($clientRequest->contrast)) $scanRequest->options["contrast"] = (int)$clientRequest->contrast;
+		if (isset($clientRequest->source)) $scanRequest->options["source"] = $clientRequest->source;
+        
+        if (isset($clientRequest->format)) {
+            $scanRequest->format = $clientRequest->format;
+        } else {
+            $scanRequest->format = Config::OutputExtension;
+        }
+        
+        if (isset($clientRequest->device)) {
+            $scanRequest->device = $clientRequest->device;
+            $scanner = ScannerOptions::get($scanRequest->device);
+            $scannerOptions = $scanner["options"];
+            $scanRequest->options["resolution"] = array_key_exists("resolution",$scannerOptions) ? $scannerOptions["resolution"]->values[0] : 0;
+        }
+        
 		$scanRequest->outputFilepath = Config::PreviewDirectory."preview.tif";
-		$scanRequest->resolution = 50;
 		$scanner = new Scanimage();
 		$scanResponse = $scanner->Execute($scanRequest);	
 		return $scanResponse;
@@ -49,73 +61,60 @@ class Api {
 	}
 
 	public static function HandleScanRequest($request) {
-		$clientRequest = $request->data;
+        $clientRequest = $request->data;
 
 		$scanRequest = new ScanRequest();
-
-		if ($clientRequest->top) {
-			$scanRequest->top = (int)$clientRequest->top;
-		}
-
-		if ($clientRequest->left) {
-			$scanRequest->left = (int)$clientRequest->left;
-		}
-
-		if ($clientRequest->height) {
-			$scanRequest->height = (int)$clientRequest->height;
-		}
-
-		if ($clientRequest->width) {
-			$scanRequest->width = (int)$clientRequest->width;
-		}
-
-		if ($clientRequest->resolution) {
-			$scanRequest->resolution = (int)$clientRequest->resolution;
-		}
-
-		if ($clientRequest->mode) {
-			$scanRequest->mode = $clientRequest->mode;
-		}
-
-		if ($clientRequest->brightness) {
-			$scanRequest->brightness = (int)$clientRequest->brightness;
-		}
-
-		if ($clientRequest->contrast) {
-			$scanRequest->contrast = (int)$clientRequest->contrast;
-		}
-
-		$outputfile = Config::OutputDirectory."Scan_".date("Y-m-d H.i.s",time()).".".Config::OutputExtension ;
+        
+        if (isset($clientRequest->resolution)) $scanRequest->options["resolution"] = (int)$clientRequest->resolution;
+		if (isset($clientRequest->mode)) $scanRequest->options["mode"] = $clientRequest->mode;
+		if (isset($clientRequest->brightness)) $scanRequest->options["brightness"] = (int)$clientRequest->brightness;
+		if (isset($clientRequest->contrast)) $scanRequest->options["contrast"] = (int)$clientRequest->contrast;
+		if (isset($clientRequest->source)) $scanRequest->options["source"] = $clientRequest->source;
+        if (isset($clientRequest->depth)) $scanRequest->options["depth"] = (int)$clientRequest->depth;
+        if (isset($clientRequest->top)) $scanRequest->options["t"] = (int)$clientRequest->top;
+        if (isset($clientRequest->left)) $scanRequest->options["l"] = (int)$clientRequest->left;
+		if (isset($clientRequest->height)) $scanRequest->options["y"] = (int)$clientRequest->height;
+		if (isset($clientRequest->width)) $scanRequest->options["x"] = (int)$clientRequest->width;
+        
+        if (isset($clientRequest->device)) 
+            $scanRequest->device = $clientRequest->device;
+            
+        if (isset($clientRequest->format)) 
+            $scanRequest->format = $clientRequest->format;
+        else 
+            $scanRequest->format = Config::OutputExtension;
+        
+        $outputfile = Config::OutputDirectory . "Scan_" . time() . "." . $scanRequest->format;
 		$scanRequest->outputFilepath = $outputfile;
 		$scanRequest->outputFilter = Config::OutputFilter;
 		$scanner = new Scanimage();
-		$scanResponse = $scanner->Execute($scanRequest);
-	
+		$scanResponse = $scanner->Execute($scanRequest);		
 		return $scanResponse;
 	}
 
-	public static function HandleGetDefaultsRequest() {
-		$response = array(
-			"top" => 0,
-			"left" => 0,
-			"width" => Config::MaximumScanWidthInMm,
-			"height" => Config::MaximumScanHeightInMm,
-			"resolution" => Config::DefaultResolution,
-			"mode" => Config::DefaultMode,
-			"brightness" => Config::DefaultBrightness,
-			"contrast" => Config::DefaultContrast
-		);
+    public static function HandleFormatListRequest() {
+        if (!System::HasConvert()) return array(Format::OutputExtension);
+        
+        $formats = array(Format::BMP,
+                         Format::JPG,
+                         Format::PDF,
+                         Format::PNG,
+                         Format::TIFF);
+        sort($formats);
+        return $formats;
+    }
 
-		return $response;
-	}
+    public static function HandleOptionListRequest() {
+        return ScannerOptions::getAll();
+    }
 
 	public static function HandleFileListRequest() {
 		$files = array();
-		$outdir = System::OutputDirectory();
+		$outdir = Config::OutputDirectory;
 
 		foreach (new DirectoryIterator($outdir) as $fileinfo) {
-			if(!is_dir($outdir.$fileinfo) && $fileinfo->getExtension() === Config::OutputExtension) {    
-				$files[$fileinfo->getMTime()] = $fileinfo->getFilename();
+			if(!is_dir($outdir.$fileinfo) && preg_match('/^Scan_[0-9]*/',$fileinfo->getFilename())) {		
+                $files[$fileinfo->getMTime()] = $fileinfo->getFilename();
 			}
 		}
 
@@ -132,14 +131,23 @@ class Api {
 	}
 
 	public static function HandleFileDeleteRequest($request) {
-		$fileInfo = new FileInfo($request->data);
+		if (!isset($request->data)) return FALSE;
+        $fileInfo = new FileInfo($request->data);
 		return $fileInfo->Delete();
+	}
+    
+    public static function HandleRefreshDevicesRequest() {
+		$devices = System::ScannerDevices();
+        file_put_contents(ScannerOptions::DEVICES_FILE, implode("\n", $devices));
+        $options = System::ScannerOptions();
+        file_put_contents(ScannerOptions::OPTIONS_FILE, implode("\n", $options));
+        return true;
 	}
 
 	public static function Main() {
 		if($_SERVER["REQUEST_METHOD"] == "POST") {
 			$input = file_get_contents('php://input');
-			$request = json_decode($input);
+            $request = json_decode($input);
 
 			$responseType = $request->type;
 				
@@ -168,9 +176,17 @@ class Api {
 					// $responseData = self::HandleCmdlineRequest($request);
 					$responseData = "cmdline is disabled. If you wish to debug httpdusr permissions you will need to manually enable this in the source.";
 					break;
-					
-				case "getDefaults":
-					$responseData = self::HandleGetDefaultsRequest();
+                    
+                case "getFormats":
+                    $responseData = self::HandleFormatListRequest();
+					break;
+                    
+                case "getOptions":
+                    $responseData = self::HandleOptionListRequest();
+					break;
+                    
+                case "refreshDevices":
+					$responseData = self::HandleRefreshDevicesRequest();
 					break;
 
 				case "ping":

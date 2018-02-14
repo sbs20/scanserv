@@ -1,26 +1,32 @@
 <?php
 include("IScanner.php");
 include("ScanResponse.php");
+include_once("ScannerOptions.php");
 
 class Scanimage implements IScanner {
 	private function CommandLine($scanRequest) {
-		$cmd = Config::Scanimage;
-		$cmd = $cmd." --mode ".$scanRequest->mode;
-		$cmd = $cmd." --depth ".$scanRequest->depth;
-		$cmd = $cmd." --resolution ".$scanRequest->resolution;
-		$cmd = $cmd." -l ".$scanRequest->left;
-		$cmd = $cmd." -t ".$scanRequest->top;
-		$cmd = $cmd." -x ".$scanRequest->width;
-		$cmd = $cmd." -y ".$scanRequest->height;
-		$cmd = $cmd." --format ".$scanRequest->format;
-		$cmd = $cmd." --brightness ".$scanRequest->brightness;
-		$cmd = $cmd." --contrast ".$scanRequest->contrast;
-
-		// Last
-		if ( empty($scanRequest->outputFilter ))
-			$cmd = $cmd.' >"'.$scanRequest->outputFilepath.'"';
+        $cmd = Config::Scanimage;
+        $cmd .= " --format='" . Config::OutputExtension . "'";
+        
+        // Set device
+        if (isset($scanRequest->device)) $cmd .= " --device-name='" . $scanRequest->device . "'";
+        // Set device-specific options
+        $scanner = ScannerOptions::get($scanRequest->device);
+        $scannerOptions = $scanner["options"];
+		foreach ($scanRequest->options as $key => $value) {
+            $cmd .= " " . $scannerOptions[$key]->name . " '" . $value . "'";
+        }
+        
+        // Make PDF a bit lighter
+        $cmd2 = Config::OutputFilter;
+        if ($scanRequest->format == Format::PDF) $cmd2 .= " -compress JPEG ";
+        
+		// No output filter or default output format which is handled by scanimage directly
+		if (empty(Config::OutputFilter) || $scanRequest->format == Config::OutputExtension)
+			$cmd = $cmd . ' > "' . $scanRequest->outputFilepath . '"';
 		else
-			$cmd = $cmd.' |'. $scanRequest->outputFilter.' "'.$scanRequest->outputFilepath.'"';
+			$cmd = $cmd . ' | ' . $cmd2 . ' "' . $scanRequest->outputFilepath . '"';
+
 		return $cmd;
 	}
 

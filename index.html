@@ -35,59 +35,34 @@
         <h1>scanserv</h1>
         <div class="row">
             <div class="col-md-5">
-                <div id="image">
-                    <img id="previmage" src="#" alt="" width=423 style="display: none" />
-                </div>
-            </div>
-
-            <div class="col-md-7">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="top">Top</label>
-                            <input id="top" type="text" class="form-control" value="0" />
+                            <label for="device">Device</label>
+                            <select id="device" class="form-control">
+                            </select>
                         </div>
-
+                    </div> 
+                    <div class="col-md-6">
                         <div class="form-group">
-                            <label for="left">Left</label>
-                            <input id="left" type="text" class="form-control" value="0" />
-                        </div>
-
-                        <div class="form-group">
-                            <label for="width">Width</label>
-                            <input id="width" type="text" class="form-control" value="215" />
-                        </div>
-
-                        <div class="form-group">
-                            <label for="height">Height</label>
-                            <input id="height" type="text" class="form-control" value="297" />
-                        </div>
-                        <div class="form-group">
-                            <button id="defaultsel" type="button" class="btn btn-default btn-lg">Full <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span></button>
+                            <br/>
+                            <button id="refreshdev" type="button" class="btn btn-default btn-lg">Refresh</button>
                         </div>
                     </div>
-
+                </div>
+                
+                <hr/>
+                
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="resolution">Resolution</label>
-                            <select id="resolution" class="form-control">
-                                <option value="50">50 dpi</option>
-                                <option value="75">75 dpi</option>
-                                <option value="100">100 dpi</option>
-                                <option value="150" selected="selected">150 dpi</option>
-                                <option value="200">200 dpi</option>
-                                <option value="300">300 dpi</option>
-                                <option value="600">600 dpi</option>
-                                <option value="1200">1200 dpi</option>
-                            </select>
+                            <select id="resolution" class="form-control"></select>
                         </div>
 
                         <div class="form-group">
-                            <label for="mode">Colour</label>
-                            <select id="mode" class="form-control">
-                                <option value="Gray">Greyscale</option>
-                                <option value="Color" selected="selected">Colour</option>
-                            </select>
+                            <label for="mode">Mode</label>
+                            <select id="mode" class="form-control"></select>
                         </div>
 
                         <label for="brightness">Brightness</label>
@@ -97,18 +72,54 @@
                         <label for="Contrast">Contrast</label>
                         <input id="contrast" type="text" class="form-control" value="0" />
                         <div id="contrast_slider" class="slider"></div>
+                        
                         <div class="form-group">
+                            <label for="format">Format</label>
+                            <select id="format" class="form-control">
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <br/>
                             <button id="defaultimg" type="button" class="btn btn-default btn-lg">Default <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>
                         </div>
                     </div>
-                </div>
+                
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="t">Top</label>
+                            <input id="t" type="text" class="form-control" value="0" />
+                        </div>
 
-                <div class="row">
-                    <br />
-                </div>
+                        <div class="form-group">
+                            <label for="l">Left</label>
+                            <input id="l" type="text" class="form-control" value="0" />
+                        </div>
 
-                <div class="row">
-                    <div class="text-right">
+                        <div class="form-group">
+                            <label for="x">Width</label>
+                            <input id="x" type="text" class="form-control" value="215" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="y">Height</label>
+                            <input id="y" type="text" class="form-control" value="296" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="source">Source</label>
+                            <select id="source" class="form-control">
+                                <option selected="selected">Flatbed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <br/>
+                            <button id="defaultsel" type="button" class="btn btn-default btn-lg">Full <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span></button>
+                        </div>
+                        
+                        <br/>
+                        
                         <div class="btn-group" role="group" aria-label="...">
                             <button id="preview" type="button" class="btn btn-default btn-lg">preview <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                             <button id="scan" type="button" class="btn btn-default btn-lg">scan <span class="glyphicon glyphicon-camera" aria-hidden="true"></span></button>
@@ -120,7 +131,7 @@
                     <br />
                 </div>
 
-                <div class="row">
+                <div id="files" class="row" style="display: none" >
                     <table class="table">
                         <thead>
                             <tr>
@@ -135,12 +146,18 @@
                                 <td>
                                     <a data-bind="attr: { href: fullname }, text: name" download></a>
                                 </td>
-                                <td data-bind="text: new Date(lastModified * 1000).toString()"></td>
+                                <td data-bind="text: lastModified"></td>
                                 <td data-bind="text: size"></td>
                                 <td><button type="button" data-bind="click: function () { page.deletefile(fullname); }"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <div id="image">
+                    <img id="previmage" src="#" alt="" width=423 style="display: none" />
                 </div>
             </div>
         </div>
@@ -161,15 +178,15 @@
 <script>
     var jcropmanager = {
 
-        previewDpi: 50,
-        millimetresPerInch: 25.4,
+        previewDpi: 50, 
+        millimetresPerInch: 25.4, 
         a4: {
             width: 215,
-            height: 297
+            height: 296
         },
         canvas: {
-            width: 215 * 50 / 25.4,
-            height: 297 * 50 / 25.4
+            width: 215 * this.previewDpi / this.millimetresPerInch,
+            height: 296 * this.previewDpi / this.millimetresPerInch
         },
 
         jcrop_api: null,
@@ -292,13 +309,47 @@
             });
         },
 
-	getdefaults: function () {
-	    api.call({
-		type: 'getDefaults'
-	    }).done(function (data) {
-		    page.defaults=data.data;
-	    });
-	},
+        getdefaults: function () {
+            api.call({
+            type: 'getDefaults'
+            }).done(function (data) {
+                page.defaults=data.data;
+            });
+        },
+        
+        getformats: function () {
+            api.call({
+            type: 'getFormats'
+            }).done(function (data) {
+                if (data.data.length > 0) {
+                    var format = $("#format");
+                    format.empty();
+                    for (var i = 0; i < data.data.length; i++) {
+                        format.append("<option value=\"" + data.data[i] + "\">" + data.data[i].toUpperCase() + "</option>");
+                    }
+                    format.val("tiff");
+                }
+            });
+        },
+        
+        getoptions: function () {
+            api.call({
+            type: 'getOptions'
+            }).done(function (data) {
+                page.device = data.data;
+                page.devices = new Array();
+                
+                if (data.data.length > 0) {
+                    var device = $("#device");
+                    device.empty();
+                    for (var i = 0; i < data.data.length; i++) {
+                        device.append("<option value=\"" + data.data[i].name + "\">" + data.data[i].description + "</option>");
+                        page.devices[data.data[i].name] = i;
+                    }
+                    device.trigger("change");
+                }
+            });
+        },
 	
         scan: function () {
             $("#scan").attr("disabled", "disabled");
@@ -322,6 +373,12 @@
                 for (var index = 0; index < response.data.length; index++) {
                     page.files.push(response.data[index]);
                 }
+                
+                if (response.data.length > 0) {
+                    $("#files").css("display","block");
+                } else {
+                    $("#files").css("display","none");
+                }  
             });
         },
 
@@ -346,34 +403,49 @@
                 page.notify(data);
             });
         },
+        
+        refreshdevices: function () {
+            $("#refreshdev").attr("disabled", "disabled");
+
+            api.call({
+                type: 'refreshDevices'
+            }).done(function (data) {
+                $("#refreshdev").removeAttr("disabled");
+                page.getoptions(data);
+            });
+        },
 
         values: function () {
             if (arguments.length === 0) {
                 return {
-                    top: parseInt($("#top").val()),
-                    left: parseInt($("#left").val()),
-                    width: parseInt($("#width").val()),
-                    height: parseInt($("#height").val()),
+                    top: parseInt($("#t").val()),
+                    left: parseInt($("#l").val()),
+                    width: parseInt($("#x").val()),
+                    height: parseInt($("#y").val()),
                     mode: $("#mode").val(),
                     depth: 8,
                     resolution: parseInt($("#resolution").val()),
-                    format: 'tiff',
+                    format: $("#format").val(),
                     brightness: parseInt($("#brightness").val()),
-                    contrast: parseInt($("#contrast").val())
+                    contrast: parseInt($("#contrast").val()),
+                    source: $("#source").val(),
+                    device: $("#device").val()
                 };
             } else {
                 var data = page.values();
                 $.extend(data, arguments[0]);
-                $("#top").val(data.top);
-                $("#left").val(data.left);
-                $("#width").val(data.width);
-                $("#height").val(data.height);
+                $("#t").val(data.top);
+                $("#l").val(data.left);
+                $("#x").val(data.width);
+                $("#y").val(data.height);
                 $("#resolution").val(data.resolution);
                 $("#mode").val(data.mode);
+                $("#format").val(data.format);
                 $("#brightness").val(data.brightness);
                 $("#brightness_slider").slider('value', data.brightness);
                 $("#contrast").val(data.contrast);
                 $("#contrast_slider").slider('value', data.contrast);
+                $("#source").val(data.source);
             }
         },
 
@@ -388,9 +460,56 @@
                 page.values(stored);
             }
         },
+        
+        updatecontrol: function (name, dummyValue) {
+            var option = page.device[page.deviceIndex].options[name];
+            if (option != null && option.defaultValue != "inactive") {
+                $("#"+name).removeAttr("disabled");
+                return option.defaultValue;
+            } else {
+                $("#"+name).attr("disabled","disabled");
+                return dummyValue;
+            }
+        },
+        
+        updateslider: function (name) {
+            var option = page.device[page.deviceIndex].options[name];
+            var minimum = 0;
+            var maximum = 0;
+            
+            if (option != null && option.defaultValue != "inactive") {
+                minimum = option.values[0];
+                maximum = option.values[option.values.length-1];
+            }
+            
+            $("#"+name+"_slider").slider({
+                min: minimum,
+                max: maximum,
+                value: 0,
+                step: 1,
+                slide: function (e, ui) {
+                    var $input = $("#" + e.target.id.replace("_slider", ""));
+                    $input.val(ui.value).change();
+                }
+            });
+        },
+        
+        populatecombo: function (name) {
+            var option = page.device[page.deviceIndex].options[name];
+            
+            if (option != null && option.defaultValue != "inactive") {
+                var element = $("#"+name);
+                element.empty();
+                for (var val = 0; val < option.values.length; val++) {
+                    element.append("<option value=\"" + option.values[val] + "\">" + option.values[val] + "</option>");
+                }
+            }
+        },
 
         init: function () {
-	    page.getdefaults();
+            page.getformats();
+            page.getoptions();
+            
             $(".slider").slider({
                 min: -100,
                 max: 100,
@@ -409,13 +528,34 @@
             $("#scan").on("click", function () {
                 page.scan();
             });
+            
+            $("#device").on("change", function () {
+                var deviceName = $(this).val();
+                page.deviceIndex = page.devices[deviceName];
+                
+                page.populatecombo("mode")
+                page.populatecombo("resolution");
+                page.populatecombo("source");
+                
+                $("#defaultimg").trigger("click");
+                $("#defaultsel").trigger("click");
+            });
+
+            $("#refreshdev").on("click", function () {
+                page.refreshdevices();
+            });
 
             $("#defaultsel").on("click", function () {
+                var left = page.updatecontrol("l", 0);
+                var top = page.updatecontrol("t", 0);
+                var width = page.updatecontrol("x", 0);
+                var height = page.updatecontrol("y", 0);
+                
                 page.values({
-                    top: page.defaults.top,
-                    left: page.defaults.left,
-                    height: page.defaults.height,
-                    width: page.defaults.width
+                    top: top,
+                    left: left,
+                    height: height,
+                    width: width
                 });
 
                 page.save();
@@ -423,11 +563,22 @@
             });
 
             $("#defaultimg").on("click", function () {
+                var resolution = page.updatecontrol("resolution", 0);
+                var mode = page.updatecontrol("mode", "");
+                var source = page.updatecontrol("source", "");
+                var brightness = page.updatecontrol("brightness", 0);
+                var contrast = page.updatecontrol("contrast", 0);
+                
+                page.updateslider("brightness");
+                page.updateslider("contrast");
+                
                 page.values({
-                    resolution: page.defaults.resolution,
-                    mode: page.defaults.mode,
-                    brightness: page.defaults.brightness,
-                    contrast: page.defaults.contrast
+                    resolution: resolution,
+                    mode: mode,
+                    brightness: brightness,
+                    contrast: contrast,
+                    source: source,
+                    format: "tiff"
                 });
 
                 page.save();
@@ -441,21 +592,31 @@
                 var val = parseInt(e.target.value);
                 var $slider = $("#" + e.target.id + "_slider");
                 val = isNaN(val) ? $slider.slider("value") : val;
-                if (val < -100) val = -100;
-                if (val > 100) val = 100;
+                var option = page.device[page.deviceIndex].options[e.target.id];
+                if (option != null) {
+                    var minimum = option.values[0];
+                    var maximum = option.values[option.values.length-1];
+                    if (val < minimum) val = minimum;
+                    if (val > maximum) val = maximum;
+                }
                 e.target.value = val;
                 $slider.slider("value", val);
             });
+            
+            $("#t, #l, #x, #y").on("change", function (e) {
+                jcropmanager.init();
+            });
+
+            $("#t, #l, #x, #y, #resolution, #mode, #format, #brightness, #contrast").on("change", function (e) {
+                page.save();
+            });
+            
             page.load();
 
             jcropmanager.init();
 
             ko.applyBindings({ files: page.files });
             page.listfiles();
-
-            $("#top, #left, #width, #height, #resolution, #mode, #brightness, #contrast").on("change", function (e) {
-                page.save();
-            });
         }
     };
 

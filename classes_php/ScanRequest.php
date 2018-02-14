@@ -1,59 +1,40 @@
 <?php
 include("System.php");
 include("Enumerations.php");
+include_once("ScannerOptions.php");
 
 class ScanRequest {
-	public $top = 0;
-	public $left = 0;
-	public $width = 215;
-	public $height = 297;
-	public $mode = "Color";
-	public $depth = 8;
-	public $resolution = 200;
-	public $format = "tiff";
+    public $device = "";
+    public $format = "";
 	public $outputFilepath = "";
-	public $brightness = 0;
-	public $contrast = 0;
-
-	public function Validate() {
+    public $outputFilter = "";
+    public $options = NULL;
+    
+    public function __construct() {
+        $this->options = array();
+    }
+    
+    public function Validate() {
 		$errors = array();
-
-		if (!Mode::isValidValue($this->mode)) {
-			array_push($errors, "Invalid mode: ".$this->mode);
-		}
-
-		if (!is_int($this->width)) {
-			array_push($errors, "Invalid width: ".$this->width);
-		}
-
-		if (!is_int($this->height)) {
-			array_push($errors, "Invalid height: ".$this->height);
-		}
-
-		if (!is_int($this->top)) {
-			array_push($errors, "Invalid top: ".$this->top);
-		}
-
-		if (!is_int($this->left)) {
-			array_push($errors, "Invalid left: ".$this->left);
-		}
-
-		if (!is_int($this->brightness)) {
-			array_push($errors, "Invalid brightness: ".$this->brightness);
-		}
-
-		if (!is_int($this->contrast)) {
-			array_push($errors, "Invalid contrast: ".$this->contrast);
-		}
-
-		if ($this->top + $this->height > Config::MaximumScanHeightInMm) {
-			array_push($errors, "Top + height exceed maximum dimensions");
-		}
-
-		/////////// MORE HERE ///////////////
-
-		/////////////////////////////////////
-		return $errors;
-	}
+        
+        // Get options from device interface
+        $scanner = ScannerOptions::get($this->device);
+        $scannerOptions = $scanner["options"];
+                
+        foreach ($this->options as $key => $value) {
+            // If option is not present in device interface or its default value marked "inactive", then remove it
+            if (!array_key_exists($key, $scannerOptions) || $scannerOptions[$key]->defaultValue === "inactive") {
+                unset($this->options[$key]);
+            // Otherwise, validate the selected value
+            } else if (!$scannerOptions[$key]->isValidValue($value)) {
+                array_push($errors, "Invalid value for " . $key . ": " . $value);
+            }
+        }
+        
+        // Make sure device name is set to the correct interface
+        $this->device = $scanner["name"];
+        
+        return $errors;
+    }
 }
 ?>

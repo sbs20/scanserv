@@ -37,13 +37,21 @@ class System {
 	}
 
 	public static function ScannerDevices() {
-		$cmd = Config::Scanimage." -L";
+		$cmd = Config::Scanimage . " -L";
 		System::Execute($cmd, $output, $ret);
 		return $output;
 	}
-
-	public static function OutputDirectory() {
-		return Config::OutputDirectory;
+	
+	public static function ScannerOptions() {
+	    $cmd = Config::Scanimage . " -A";	
+	    System::Execute($cmd, $output, $ret);
+		return $output;
+	}
+    
+    public static function HasConvert() {
+	    $cmd = "which " . Config::Convert;	
+	    System::Execute($cmd, $output, $ret);
+		return count($output) > 0;
 	}
 }
 ?>
