@@ -1,6 +1,79 @@
 # installation
 Make sure your scanner is [working with SANE](install-sane.md).
 
+## Debian / Raspbian / Ubuntu
+
+### Prerequisites
+
+```
+sudo apt-get update
+sudo apt-get install apache2 apache2-utils libapache2-mod-php5 php5 sane-utils imagemagick
+```
+On newer debians you will need
+```
+sudo apt-get install apache2 apache2-utils libapache2-mod-php sane-utils imagemagick
+```
+
+Check apache can use SANE. If you know about saned and permissions then you may
+not need to worry about this.
+
+```
+sudo su -m www-data -c 'scanimage --test'
+```
+
+if not then try
+
+```
+sudo gpasswd -a www-data scanner
+```
+
+### Install
+Here's a one liner to install
+```
+wget -O ~/install.sh https://raw.githubusercontent.com/sbs20/scanserv/master/install.sh && chmod +x ~/install.sh && sudo ~/install.sh
+```
+
+### Manual install
+Download and install scanserv (note, this will download a file called master.zip
+to the current user's home directory). 
+
+```
+cd ~
+sudo wget https://github.com/sbs20/scanserv/archive/master.zip
+```
+Note, older versions of raspbian install web pages in `/var/www`, we are
+assuming `/var/www/html` as that is what newer versions use. We are going to
+install scanserv so that you can access it with the url
+
+http://my.example.com/scanserv
+
+```
+cd /var/www/html
+sudo unzip ~/master.zip
+sudo mv scanserv-master/ scanserv
+```
+
+Ideally you should limit access to these directories like this...
+
+```
+sudo chown -R root:www-data /var/www/html/scanserv/output/
+sudo chown -R root:www-data /var/www/html/scanserv/preview/
+```
+
+And set write permissions - the web site needs to create image files in these directories
+
+```
+sudo chmod 775 /var/www/html/scanserv/output/
+sudo chmod 775 /var/www/html/scanserv/preview/
+```
+
+If you want to change any configuration then look in
+`/var/www/html/scanserv/classes_php/Config.php`
+
+## References
+ * http://forum.qnap.com/viewtopic.php?f=182&t=8351
+ * http://sourceforge.net/p/phpsane/wiki/FreeBSD/
+
 ## QNAP
 ```
 cd ~
@@ -38,71 +111,6 @@ class Config {
  * You may need to set the permissions of your new directory: `chmod 775 /share/Qweb/scanserv`
  * Ensure your QNAP web server is running
  * Open your browser and navigate to http://YOUR_QNAP:PORT/scanserv/ 
-
-## Raspberry Pi / Debian
-
-```
-sudo apt-get update
-sudo apt-get install apache2 apache2-utils libapache2-mod-php5 php5 sane-utils imagemagick
-```
-
-Check apache can use SANE. If you know about saned and permissions then you may not need to worry about this.
-
-```
-sudo su -m www-data -c 'scanimage --test'
-```
-
-if not then try
-
-```
-sudo gpasswd -a www-data scanner
-```
-
-### Download and configure
-Download and install scanserv (note, this will download a file called master.zip to the current user's home
-directory). 
-
-```
-cd ~
-sudo wget https://github.com/sbs20/scanserv/archive/master.zip
-```
-Note, older versions of raspbian install web pages in /var/www, we are assuming /var/www/html as that is 
-what newer versions use. We are going to install scanserv so that you can access it with the url
-http://my.pi.example.com/scanserv
-
-```
-cd /var/www/html
-sudo unzip ~/master.zip
-sudo mv scanserv-master/ scanserv
-```
-
-Ideally you should limit access to these directories like this...
-
-```
-sudo chown -R root:www-data /var/www/html/scanserv/output/
-sudo chown -R root:www-data /var/www/html/scanserv/preview/
-```
-
-And set write permissions - the web site needs to create image files in these directories
-
-```
-sudo chmod 775 /var/www/html/scanserv/output/
-sudo chmod 775 /var/www/html/scanserv/preview/
-```
-
-Now configure scanserv to point at the binaries
-
-```
-sudo nano /var/www/html/scanserv/classes_php/Config.php
-```
-    * Change /opt/bin/scanimage to /usr/bin/scanimage
-    * Change /opt/bin/convert to /usr/bin/convert
-
-Edit anything else you think is interesting, though the other defaults should be okay.
-
-## References
- * http://forum.qnap.com/viewtopic.php?f=182&t=8351
- * http://sourceforge.net/p/phpsane/wiki/FreeBSD/
 
 ## QNAP NAS install OLD (Pre QTS version 4.0?)
  * [Install IPKG](http://wiki.qnap.com/wiki/Install_Optware_IPKG)

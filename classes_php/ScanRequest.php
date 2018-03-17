@@ -22,8 +22,10 @@ class ScanRequest {
         $scannerOptions = $scanner["options"];
                 
         foreach ($this->options as $key => $value) {
-            // If option is not present in device interface or its default value marked "inactive", then remove it
-            if (!array_key_exists($key, $scannerOptions) || $scannerOptions[$key]->defaultValue === "inactive") {
+            // If option is not present in device interface or its default
+            // value marked "inactive", then remove it
+            if (!array_key_exists($key, $scannerOptions) ||
+                $scannerOptions[$key]->defaultValue === "inactive") {
                 unset($this->options[$key]);
             // Otherwise, validate the selected value
             } else if (!$scannerOptions[$key]->isValidValue($value)) {

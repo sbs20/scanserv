@@ -22,8 +22,9 @@ final class ScannerOptions {
     private static $options = NULL;
     
     public static function getAll() {
-        if (self::$options == NULL) 
-            self::$options = self::parseOptions();       
+        if (self::$options == NULL) {
+            self::$options = self::parseOptions();
+        }
             
         return self::$options;
     }
@@ -89,25 +90,30 @@ final class ScannerOptions {
                 $option->name = $matched[1];
                 $option->defaultValue = preg_replace("/(\[|\])/","",$matched[3]);
                 
-                if (strstr($matched[2],"|")) { // Fixed set of enumerated values, separated with "|"
+                if (strstr($matched[2],"|")) { 
+                    // Fixed set of enumerated values, separated with "|"
                     $option->values = explode("|",$matched[2]);
                     $option->isRange = false;
-                } else if (strstr($matched[2],"..")) { // Values ranging from low to high, i.e., lo ".." hi
+                } else if (strstr($matched[2],"..")) {
+                    // Values ranging from low to high, i.e., lo ".." hi
                     $option->values = explode("..",$matched[2]);
                     $option->isRange = true;
-                } else { // Single element, manually create array
+                } else {
+                    // Single element, manually create array
                     $option->values = array($matched[2]);
                     $option->isRange = false;
                 }
                 
-                // Floor all numerical option values... no reason found to keep them as floats
+                // Floor all numerical option values... no reason found to keep
+                // them as floats
                 if (is_numeric($option->defaultValue)) {
                     $option->defaultValue = floor($option->defaultValue);
                     for ($n = 0; $n < count($option->values); ++$n) $option->values[$n] = floor($option->values[$n]);
                 }
                 
-                // Check whether interface accepts a range for resolution and enumerate instead
-                // This is to avoid having to make a slider for resolution in frontend
+                // Check whether interface accepts a range for resolution and
+                // enumerate instead. This is to avoid having to make a slider
+                // for resolution in frontend
                 if ($option->isRange && $key == "resolution") {
                     $option->isRange = false;
                     $increasing = array();
