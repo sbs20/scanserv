@@ -21,8 +21,16 @@ if ! cd /var/www/html; then
 fi
 
 sudo unzip ~/scanserv.zip
+
+echo "Moving to $(pwd)/scanserv"
 sudo mv scanserv-master scanserv
+
+echo "Updating ownership"
 sudo chown -R root:www-data scanserv/output/
 sudo chown -R root:www-data scanserv/preview/
+
+echo "Updating permissions"
 sudo chmod 775 scanserv/output/
 sudo chmod 775 scanserv/preview/
+
+echo "Installation complete"
