@@ -20,6 +20,15 @@ if ! cd /var/www/html; then
     exit 1
 fi
 
+if [ -d scanserv ]; then
+    echo "Destination directory already exists. Aborting installation."
+    echo "If you don't care about existing data then:"
+    echo
+    echo "sudo rm -rf $(pwd)/scanserv"
+    exit 1
+fi
+
+rm -rf scanserv-master
 sudo unzip ~/scanserv.zip
 
 echo "Moving to $(pwd)/scanserv"
