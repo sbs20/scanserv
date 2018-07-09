@@ -29,16 +29,15 @@ class Scanimage implements IScanner {
         }
         
         // Make PDF a bit lighter
-        $cmd2 = Config::OutputFilter;
         if ($scanRequest->format == Format::PDF) {
 			$cmd2 .= " -compress JPEG -quality 50 ";
 		}
 
 		// No output filter or default output format which is handled by scanimage directly
-		if (empty(Config::OutputFilter) || $scanRequest->format == Config::OutputExtension) {
+		if (defined("Config::OutputFilter") || $scanRequest->format == Config::OutputExtension) {
 			$cmd = $cmd . ' > "' . $scanRequest->outputFilepath . '"';
 		} else {
-			$cmd = $cmd . ' | ' . $cmd2 . ' "' . $scanRequest->outputFilepath . '"';
+			$cmd = $cmd . ' | ' . Config::OutputFilter . ' "' . $scanRequest->outputFilepath . '"';
 		}
 
 		return $cmd;
