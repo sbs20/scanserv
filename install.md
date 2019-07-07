@@ -11,7 +11,7 @@ sudo apt-get install apache2 apache2-utils libapache2-mod-php5 php5 sane-utils i
 ```
 On newer debians you will need
 ```
-sudo apt-get install apache2 apache2-utils libapache2-mod-php sane-utils imagemagick
+sudo apt install apache2 apache2-utils libapache2-mod-php sane-utils imagemagick
 ```
 
 Check apache can use SANE. If you know about saned and permissions then you may
@@ -33,46 +33,8 @@ Here's a one liner to install
 wget -O ~/install.sh https://raw.githubusercontent.com/sbs20/scanserv/master/install.sh && chmod +x ~/install.sh && sudo ~/install.sh
 ```
 
-### Manual install
-Download and install scanserv (note, this will download a file called master.zip
-to the current user's home directory). 
-
-```
-cd ~
-sudo wget https://github.com/sbs20/scanserv/archive/master.zip
-```
-Note, older versions of raspbian install web pages in `/var/www`, we are
-assuming `/var/www/html` as that is what newer versions use. We are going to
-install scanserv so that you can access it with the url
-
-http://my.example.com/scanserv
-
-```
-cd /var/www/html
-sudo unzip ~/master.zip
-sudo mv scanserv-master/ scanserv
-```
-
-Ideally you should limit access to these directories like this...
-
-```
-sudo chown -R root:www-data /var/www/html/scanserv/output/
-sudo chown -R root:www-data /var/www/html/scanserv/preview/
-```
-
-And set write permissions - the web site needs to create image files in these directories
-
-```
-sudo chmod 775 /var/www/html/scanserv/output/
-sudo chmod 775 /var/www/html/scanserv/preview/
-```
-
 If you want to change any configuration then look in
 `/var/www/html/scanserv/classes_php/Config.php`
-
-## References
- * http://forum.qnap.com/viewtopic.php?f=182&t=8351
- * http://sourceforge.net/p/phpsane/wiki/FreeBSD/
 
 ## QNAP
 ```
@@ -112,6 +74,18 @@ class Config {
  * Ensure your QNAP web server is running
  * Open your browser and navigate to http://YOUR_QNAP:PORT/scanserv/ 
 
+## Arch
+To fix permissions
+
+ * useradd -m scanservhttpd
+ * sudo usermod -G scanner scanservhttpd
+
+Confirm:
+```
+sudo -i -u scanservhttd
+scanimage -L
+```
+
 ## QNAP NAS install OLD (Pre QTS version 4.0?)
  * [Install IPKG](http://wiki.qnap.com/wiki/Install_Optware_IPKG)
  * SSH into your NAS - e.g. use PuTTY as admin
@@ -130,3 +104,7 @@ class Config {
  * You may need to set the permissions of your new directory: `chmod 775 /share/Qweb/scanserv`
  * Ensure your QNAP web server is running
  * Open your browser and navigate to http://YOUR_QNAP:PORT/scanserv/ 
+
+## References
+ * http://forum.qnap.com/viewtopic.php?f=182&t=8351
+ * http://sourceforge.net/p/phpsane/wiki/FreeBSD/
