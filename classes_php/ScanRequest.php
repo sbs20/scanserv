@@ -6,7 +6,7 @@ include_once("ScannerOptions.php");
 class ScanRequest {
     public $device = "";
     public $format = "";
-	public $outputFilepath = "";
+    public $outputFilepath = "";
     public $outputFilter = "";
     public $options = NULL;
     
@@ -15,7 +15,7 @@ class ScanRequest {
     }
     
     public function Validate() {
-		$errors = array();
+        $errors = array();
         
         // Get options from device interface
         $scanner = ScannerOptions::get($this->device);

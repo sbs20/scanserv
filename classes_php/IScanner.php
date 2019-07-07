@@ -1,5 +1,5 @@
 <?php
 interface IScanner {
-	public function Execute($scanRequest);
+    public function Execute($scanRequest);
 }
 ?>

@@ -210,7 +210,7 @@
                 height: jcropmanager.dotsToMm(c.h)
             });
 
-    	    page.save();
+            page.save();
         },
 
         //jcrop onRelease event handler
@@ -222,7 +222,7 @@
                 height: ''
             });
             
-    	    page.save();
+            page.save();
         },
 
         getSelect: function () {
@@ -350,7 +350,7 @@
                 }
             });
         },
-	
+    
         scan: function () {
             $("#scan").attr("disabled", "disabled");
 
@@ -559,7 +559,7 @@
                 });
 
                 page.save();
-        		jcropmanager.init();
+                jcropmanager.init();
             });
 
             $("#defaultimg").on("click", function () {

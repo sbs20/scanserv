@@ -1,13 +1,13 @@
 <?php
 class FileInfo {
-	public $fullname;
-	public $name;
-	public $path;
-	public $extension;
-	public $lastModified;
-	public $size;
+    public $fullname;
+    public $name;
+    public $path;
+    public $extension;
+    public $lastModified;
+    public $size;
 
-	function FileInfo($fullname) {
+    function FileInfo($fullname) {
         $this->fullname = $fullname;
 
         $bytes = filesize($this->fullname);
@@ -29,12 +29,12 @@ class FileInfo {
         $this->lastModified = date("Y-m-d @ H:i:s",filemtime($this->fullname));
     }
 
-	public function Delete() {
+    public function Delete() {
         if(is_readable($this->fullname)) {
             return unlink($this->fullname);
         }
 
-		return false;
-	}
+        return false;
+    }
 }
 ?>
