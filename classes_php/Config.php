@@ -10,12 +10,12 @@ class Config {
     const Convert  = "/usr/bin/convert";
     const PreviewFilter = "/usr/bin/convert 2>/dev/null  - -trim -quality 30  ";
 
-    // Use an empty filter by default. The spirit of the default implementation
-    // is to create non-lossy scans with no post processing. Should you wish to 
-    // override this behaviour then change the filter which will have the
-    // scanimage output piped to it.
-    //const OutputFilter = "/opt/bin/convert 2>/dev/null  - -normalize -sharpen 0x1 ";
-    const OutputFilter = self::Convert . " - ";
+	// Use an empty filter by default. The spirit of the default implementation
+	// is to create non-lossy scans with no post processing. Should you wish to 
+	// override this behaviour then change the filter which will have the
+	// scanimage output piped to it.
+	//const OutputFilter = "/opt/bin/convert 2>/dev/null  - -normalize -sharpen 0x1 ";
+	const OutputFilter = "cat";
 
     // As with the output filter, the default implementation prefers non-lossy
     // output. Should you wish you override this then you can change the output 
