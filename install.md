@@ -27,6 +27,13 @@ if not then try
 sudo gpasswd -a www-data scanner
 ```
 
+Or perhaps
+
+```
+# it's necessary to add www-data to "lp" with
+sudo usermod -a -G lp www-data
+```
+
 ### Install
 Here's a one liner to install
 ```
